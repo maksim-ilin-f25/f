@@ -26,6 +26,8 @@ dependencies {
 
     // This dependency is used by the application.
     implementation(libs.guava)
+
+    implementation("com.github.ajalt.clikt:clikt:5.0.3")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
