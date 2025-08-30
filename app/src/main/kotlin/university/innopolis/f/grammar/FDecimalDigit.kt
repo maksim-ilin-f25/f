@@ -1,29 +1,18 @@
-enum class FDecimalDigit {
-    ZERO,
-    ONE,
-    TWO,
-    THREE,
-    FOUR,
-    FIVE,
-    SIX,
-    SEVEN,
-    EIGHT,
-    NINE;
+@JvmInline
+value class FDecimalDigit(private val inner: UByte) {
+    init {
+        require(this.inner in 0u..9u)
+    }
 
     companion object {
-        fun fromCharOrNull(c: Char): FDecimalDigit? =
-                when (c) {
-                    '0' -> ZERO
-                    '1' -> ONE
-                    '2' -> TWO
-                    '3' -> THREE
-                    '4' -> FOUR
-                    '5' -> FIVE
-                    '6' -> SIX
-                    '7' -> SEVEN
-                    '8' -> EIGHT
-                    '9' -> NINE
-                    else -> null
-                }
+        fun UByte.toFDecimalDigitOrNull(): FDecimalDigit? =
+                runCatching { FDecimalDigit(this) }.getOrNull()
+
+        fun Char.toFDecimalDigitOrNull(): FDecimalDigit? {
+            if (this.code > 255) {
+                return null
+            }
+            return runCatching { FDecimalDigit(this.code.toUByte()) }.getOrNull()
+        }
     }
 }

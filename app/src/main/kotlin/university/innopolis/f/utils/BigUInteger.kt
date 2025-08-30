@@ -7,7 +7,7 @@ value class BigUInteger(private val inner: BigInteger) {
     }
 
     companion object {
-        fun fromFDecimalDigits(digits: List<FDecimalDigit>): BigUInteger {
+        fun List<FDecimalDigit>.toBigUInteger(): BigUInteger {
             TODO()
         }
     }
