@@ -1,3 +1,5 @@
+package university.innopolis.f.grammar
+
 @JvmInline
 value class FLetter(private val inner: UByte) {
     init {

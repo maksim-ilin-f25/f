@@ -1,3 +1,6 @@
+package university.innopolis.f.utils
+
+import university.innopolis.f.grammar.FDecimalDigit
 import java.math.BigInteger
 
 @JvmInline
