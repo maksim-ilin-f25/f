@@ -1,0 +1,7 @@
+(println (prog ()
+    (while (true)
+        (break)
+        (return 1)
+    )
+    (return 0)
+))

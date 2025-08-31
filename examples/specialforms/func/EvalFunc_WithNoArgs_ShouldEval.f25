@@ -1,0 +1,2 @@
+(func GetBirthday () (2 8 2005))
+(println (GetBirthday))

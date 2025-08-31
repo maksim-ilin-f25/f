@@ -1,0 +1,2 @@
+(func ComputeSum (first second) (plus first second))
+(println (ComputeSum 21 89))
