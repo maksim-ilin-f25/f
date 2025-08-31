@@ -1,3 +1,5 @@
+package university.innopolis.f.grammar
+
 import java.math.BigInteger
 
 @JvmInline

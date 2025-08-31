@@ -1,3 +1,5 @@
+package university.innopolis.f.grammar
+
 @JvmInline
 value class FDecimalDigit(private val inner: UByte) {
     init {
@@ -6,7 +8,7 @@ value class FDecimalDigit(private val inner: UByte) {
 
     companion object {
         fun UByte.toFDecimalDigitOrNull(): FDecimalDigit? =
-                runCatching { FDecimalDigit(this) }.getOrNull()
+            runCatching { FDecimalDigit(this) }.getOrNull()
 
         fun Char.toFDecimalDigitOrNull(): FDecimalDigit? {
             if (this.code > 255) {
