@@ -1,0 +1,28 @@
+package university.innopolis.f.tokenizer
+
+enum class FPredefinedFunction {
+    PLUS,
+    MINUS,
+    TIMES,
+    DIVIDE,
+    HEAD,
+    TAIL,
+    CONS,
+    EQUAL,
+    NONEQUAL,
+    LESS,
+    LESSEQ,
+    GREATER,
+    GREATEREQ,
+    ISINT,
+    ISREAL,
+    ISBOOL,
+    ISNULL,
+    ISATOM,
+    ISLIST,
+    AND,
+    OR,
+    XOR,
+    NOT,
+    EVAL,
+}
