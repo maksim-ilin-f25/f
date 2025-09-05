@@ -1,0 +1,5 @@
+(setq shadow 0)
+(prog ((shaow shaow))
+    (setq shadow 1)
+    (println shadow))
+(println shadow)

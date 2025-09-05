@@ -1,0 +1,2 @@
+(func IncrementNum (num) (return (plus num 1)))
+(println (IncrementNum 20))
