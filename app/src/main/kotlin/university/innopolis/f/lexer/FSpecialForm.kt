@@ -1,4 +1,4 @@
-package university.innopolis.f.tokenizer
+package university.innopolis.f.lexer
 
 enum class FSpecialForm {
     QUOTE,
