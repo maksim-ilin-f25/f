@@ -2,6 +2,7 @@ package university.innopolis.f.lexer
 
 import university.innopolis.f.grammar.FIdentifier
 import university.innopolis.f.grammar.FLiteral
+import university.innopolis.f.lexer.model.FSpecialForm
 
 sealed class FToken {
     object OpeningParenthesis : FToken()

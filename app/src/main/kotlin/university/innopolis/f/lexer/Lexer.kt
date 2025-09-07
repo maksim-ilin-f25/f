@@ -1,6 +1,7 @@
 package university.innopolis.f.lexer
 
 import university.innopolis.f.lexer.state.ParsingState
+import university.innopolis.f.lexer.state.WaitFor
 import java.io.InputStream
 
 class Lexer {
@@ -27,35 +28,51 @@ class Lexer {
     }
 
     private fun processOpeningParenthesis() {
+        TODO("if parsingState.currentToken is not empty, then process it")
         tokenBuffer.add(FToken.OpeningParenthesis)
     }
 
     private fun processClosingParenthesis() {
+        TODO("if parsingState.currentToken is not empty, then process it")
         tokenBuffer.add(FToken.ClosingParenthesis)
     }
 
     private fun processQuote() {
+        TODO("if parsingState.currentToken is not empty, then process it")
         tokenBuffer.add(FToken.Quote)
     }
 
     private fun processPlus() {
-        TODO()
+        TODO("idk what to do if parsingState.currentToken is not empty")
+        parsingState = parsingState.copy(currentToken = "+", waitFor = WaitFor.DIGIT)
     }
 
     private fun processMinus() {
-        TODO()
+        TODO("idk what to do if parsingState.currentToken is not empty")
+        parsingState = parsingState.copy(currentToken = "-", waitFor = WaitFor.DIGIT)
     }
 
     private fun processDot() {
-        TODO()
+        TODO("idk what to do if parsingState.currentToken contains letters")
+        parsingState =
+            parsingState.copy(
+                currentToken = parsingState.currentToken + ".",
+                waitFor = WaitFor.DIGIT,
+            )
     }
 
-    private fun processDigit() {
-        TODO()
+    private fun processDigit(digit: Char) {
+        val waitFor =
+            if (parsingState.currentToken.contains(".")) WaitFor.DIGIT_WHITESPACE
+            else WaitFor.DIGIT_DOT_WHITESPACE
+        parsingState.copy(currentToken = parsingState.currentToken + digit, waitFor = waitFor)
     }
 
-    private fun processLetter() {
-        TODO()
+    private fun processLetter(letter: Char) {
+        parsingState.copy(
+            currentToken = parsingState.currentToken + letter,
+            waitFor = WaitFor.LETTER_WHITESPACE,
+        )
     }
 
     private fun processWhitespace() {
