@@ -11,4 +11,5 @@ plugins {
 }
 
 rootProject.name = "f"
+
 include("app")
