@@ -4,7 +4,7 @@ import university.innopolis.f.grammar.FIdentifier
 import university.innopolis.f.grammar.FLiteral
 import university.innopolis.f.lexer.model.FSpecialForm
 
-sealed class FToken {
+sealed class FToken() {
     object OpeningParenthesis : FToken()
 
     object ClosingParenthesis : FToken()
@@ -17,3 +17,5 @@ sealed class FToken {
 
     object Quote : FToken()
 }
+
+data class TokenCoordinate(val line: UInt, val column: UInt)

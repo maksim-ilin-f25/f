@@ -1,6 +1,5 @@
 package university.innopolis.f.grammar
 
-import university.innopolis.f.utils.BigUInteger
-import java.math.BigInteger
+import java.math.BigDecimal
 
-class FReal(whole: BigInteger, fractional: BigUInteger)
+class FReal(inner: BigDecimal)

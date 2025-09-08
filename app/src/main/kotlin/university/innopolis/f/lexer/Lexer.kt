@@ -1,91 +1,110 @@
 package university.innopolis.f.lexer
 
-import university.innopolis.f.lexer.state.ParsingState
-import university.innopolis.f.lexer.state.WaitFor
+import university.innopolis.f.utils.CharUtils.isAsciiDigit
+import university.innopolis.f.utils.CharUtils.isAsciiLetter
+import java.io.ByteArrayInputStream
 import java.io.InputStream
 
-class Lexer {
+class Lexer() {
     private val tokenBuffer = emptyList<FToken>().toMutableList()
-    private var parsingState = ParsingState()
+    private var currentTokenState = CurrentTokenState()
 
-    fun tokenize(sourceCode: InputStream): List<FToken> {
+    fun tokenize(sourceCode: InputStream): Result<List<FToken>> {
         val code = sourceCode.bufferedReader().use { it.readText() }
         for (char in code) {
             when {
                 char == '(' -> processOpeningParenthesis()
                 char == ')' -> processClosingParenthesis()
                 char == '\'' -> processQuote()
-                char == '+' -> TODO()
-                char == '-' -> TODO()
-                char == '.' -> TODO()
-                char.isAsciiDigit() -> TODO()
-                char.isAsciiLetter() -> TODO()
-                char.isWhitespace() -> TODO()
-                else -> TODO()
+                char == '+' -> processPlus()
+                char == '-' -> processMinus()
+                char == '.' -> processDot()
+                char.isAsciiDigit() -> processDigit(char)
+                char.isAsciiLetter() -> processLetter(char)
+                char.isWhitespace() -> processWhitespace()
+                else -> return Result.failure(TokenizeException.InvalidChar(char))
             }
         }
-        return tokenBuffer
+        return Result.success(tokenBuffer)
     }
 
-    private fun processOpeningParenthesis() {
-        TODO("if parsingState.currentToken is not empty, then process it")
-        tokenBuffer.add(FToken.OpeningParenthesis)
+    private fun processOpeningParenthesis(): Result<Unit> {
+        val result = this.addCurrentToken()
+        this.addToken(FToken.OpeningParenthesis)
+        return result
     }
 
-    private fun processClosingParenthesis() {
-        TODO("if parsingState.currentToken is not empty, then process it")
-        tokenBuffer.add(FToken.ClosingParenthesis)
+    private fun processClosingParenthesis(): Result<Unit> {
+        val result = this.addCurrentToken()
+        this.addToken(FToken.ClosingParenthesis)
+        return result
     }
 
-    private fun processQuote() {
-        TODO("if parsingState.currentToken is not empty, then process it")
-        tokenBuffer.add(FToken.Quote)
+    private fun processQuote(): Result<Unit> {
+        val result = this.addCurrentToken()
+        this.addToken(FToken.Quote)
+        return result
     }
 
-    private fun processPlus() {
-        TODO("idk what to do if parsingState.currentToken is not empty")
-        parsingState = parsingState.copy(currentToken = "+", waitFor = WaitFor.DIGIT)
+    private fun processPlus(): Result<Unit> {
+        return if (currentTokenState.isEmpty()) {
+            currentTokenState.add('+')
+            Result.success(Unit)
+        } else {
+            Result.failure(TokenizeException.UnexpectedChar('+'))
+        }
     }
 
-    private fun processMinus() {
-        TODO("idk what to do if parsingState.currentToken is not empty")
-        parsingState = parsingState.copy(currentToken = "-", waitFor = WaitFor.DIGIT)
+    private fun processMinus(): Result<Unit> {
+        return if (currentTokenState.isEmpty()) {
+            currentTokenState.add('-')
+            Result.success(Unit)
+        } else {
+            Result.failure(TokenizeException.UnexpectedChar('-'))
+        }
     }
 
-    private fun processDot() {
-        TODO("idk what to do if parsingState.currentToken contains letters")
-        parsingState =
-            parsingState.copy(
-                currentToken = parsingState.currentToken + ".",
-                waitFor = WaitFor.DIGIT,
-            )
+    private fun processDot(): Result<Unit> {
+        if (!currentTokenState.canAddDot()) {
+            return Result.failure(TokenizeException.UnexpectedChar('.'))
+        }
+        currentTokenState.add('.')
+        return Result.success(Unit)
     }
 
     private fun processDigit(digit: Char) {
-        val waitFor =
-            if (parsingState.currentToken.contains(".")) WaitFor.DIGIT_WHITESPACE
-            else WaitFor.DIGIT_DOT_WHITESPACE
-        parsingState.copy(currentToken = parsingState.currentToken + digit, waitFor = waitFor)
+        currentTokenState.add(digit)
     }
 
-    private fun processLetter(letter: Char) {
-        parsingState.copy(
-            currentToken = parsingState.currentToken + letter,
-            waitFor = WaitFor.LETTER_WHITESPACE,
-        )
-    }
-
-    private fun processWhitespace() {
-        TODO()
-    }
-
-    companion object {
-        private fun Char.isAsciiLetter(): Boolean {
-            return this in 'A'..'Z' || this in 'a'..'z'
+    private fun processLetter(letter: Char): Result<Unit> {
+        if (!currentTokenState.canAddLetter()) {
+            return Result.failure(TokenizeException.UnexpectedChar(letter))
         }
-
-        private fun Char.isAsciiDigit(): Boolean {
-            return this in '0'..'9'
-        }
+        currentTokenState.add(letter)
+        return Result.success(Unit)
     }
+
+    private fun processWhitespace(): Result<Unit> {
+        return addCurrentToken()
+    }
+
+    private fun addCurrentToken(): Result<Unit> {
+        val token = currentTokenState.build()
+        if (token == null) {
+            return Result.failure(TokenizeException.InvalidToken(currentTokenState.rawValue))
+        }
+        this.addToken(token)
+        return Result.success(Unit)
+    }
+
+    private fun addToken(token: FToken) {
+        tokenBuffer.add(token)
+        currentTokenState.clear()
+    }
+}
+
+fun main() {
+    val sourceCode = "(1 2.0 hello true null ')"
+    val result = Lexer().tokenize(ByteArrayInputStream(sourceCode.toByteArray(Charsets.UTF_8)))
+    println(result)
 }
