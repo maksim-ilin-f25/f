@@ -44,7 +44,7 @@ tasks.named<Test>("test") {
     // Use JUnit Platform for unit tests.
     useJUnitPlatform()
 }
+
 val compileKotlin: KotlinCompile by tasks
-compileKotlin.compilerOptions {
-    freeCompilerArgs.set(listOf("-Xwhen-guards"))
-}
+
+compileKotlin.compilerOptions { freeCompilerArgs.set(listOf("-Xwhen-guards")) }
