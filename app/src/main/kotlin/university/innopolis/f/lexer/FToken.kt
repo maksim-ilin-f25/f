@@ -5,17 +5,29 @@ import university.innopolis.f.grammar.FLiteral
 import university.innopolis.f.lexer.model.FSpecialForm
 
 sealed class FToken() {
-    object OpeningParenthesis : FToken()
+    object OpeningParenthesis : FToken() {
+        override fun toString() = "OpeningParenthesis"
+    }
 
-    object ClosingParenthesis : FToken()
+    object ClosingParenthesis : FToken() {
+        override fun toString() = "ClosingParenthesis"
+    }
 
-    data class Identifier(val name: FIdentifier) : FToken()
+    data class Identifier(val name: FIdentifier) : FToken() {
+        override fun toString() = this.name.toString()
+    }
 
-    data class Literal(val value: FLiteral) : FToken()
+    data class Literal(val value: FLiteral) : FToken() {
+        override fun toString() = this.value.toString()
+    }
 
-    data class SpecialForm(val name: FSpecialForm) : FToken()
+    data class SpecialForm(val name: FSpecialForm) : FToken() {
+        override fun toString() = this.name.toString()
+    }
 
-    object Quote : FToken()
+    object Quote : FToken() {
+        override fun toString() = "Quote"
+    }
 }
 
 data class TokenCoordinate(val line: UInt, val column: UInt)
