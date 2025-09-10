@@ -102,7 +102,15 @@ private class Lexer() {
 }
 
 fun main() {
-    val sourceCode = "(cond 1 2.0 hello true null ')"
+    val sourceCode = "(func foo (a b) (times (plus a b) 2.0))"
     val result = tokenize(sourceCode)
-    println(result)
+
+    println()
+    println(
+        if (result.isSuccess) {
+            result.getOrThrow()
+        } else {
+            result.exceptionOrNull()!!
+        }
+    )
 }
