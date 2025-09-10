@@ -3,7 +3,7 @@ package university.innopolis.f.lexer
 import university.innopolis.f.utils.CharUtils.isAsciiDigit
 import university.innopolis.f.utils.CharUtils.isAsciiLetter
 
-public fun tokenize(sourceCode: String): Result<List<FToken>> = Lexer().tokenize(sourceCode)
+fun tokenize(sourceCode: String): Result<List<FToken>> = Lexer().tokenize(sourceCode)
 
 private class Lexer() {
     private val tokenBuffer = emptyList<FToken>().toMutableList()
@@ -88,10 +88,9 @@ private class Lexer() {
     }
 
     private fun addCurrentToken(): Result<Unit> {
-        val token = currentTokenState.build()
-        if (token == null) {
-            return Result.failure(TokenizeException.InvalidToken(currentTokenState.rawValue))
-        }
+        val token =
+            currentTokenState.build()
+                ?: return Result.failure(TokenizeException.InvalidToken(currentTokenState.rawValue))
         this.addToken(token)
         return Result.success(Unit)
     }
