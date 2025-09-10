@@ -14,7 +14,7 @@ value class FIdentifier(private val name: String) {
         )
     }
 
-    override fun toString() = "Identifier(${this.name})"
+    override fun toString() = "Identifier(\"${this.name}\")"
 
     companion object {
         fun String.toFIdentifierOrNull(): FIdentifier? =
