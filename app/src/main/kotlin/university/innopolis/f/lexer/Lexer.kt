@@ -12,15 +12,39 @@ private class Lexer() {
     fun tokenize(sourceCode: String): Result<List<FToken>> {
         for (char in sourceCode) {
             when {
-                char == '(' -> processOpeningParenthesis()
-                char == ')' -> processClosingParenthesis()
-                char == '\'' -> processQuote()
-                char == '+' -> processPlus()
-                char == '-' -> processMinus()
-                char == '.' -> processDot()
+                char == '(' ->
+                    processOpeningParenthesis().getOrElse {
+                        return Result.failure(it)
+                    }
+                char == ')' ->
+                    processClosingParenthesis().getOrElse {
+                        return Result.failure(it)
+                    }
+                char == '\'' ->
+                    processQuote().getOrElse {
+                        return Result.failure(it)
+                    }
+                char == '+' ->
+                    processPlus().getOrElse {
+                        return Result.failure(it)
+                    }
+                char == '-' ->
+                    processMinus().getOrElse {
+                        return Result.failure(it)
+                    }
+                char == '.' ->
+                    processDot().getOrElse {
+                        return Result.failure(it)
+                    }
                 char.isAsciiDigit() -> processDigit(char)
-                char.isAsciiLetter() -> processLetter(char)
-                char.isWhitespace() -> processWhitespace()
+                char.isAsciiLetter() ->
+                    processLetter(char).getOrElse {
+                        return Result.failure(it)
+                    }
+                char.isWhitespace() ->
+                    processWhitespace().getOrElse {
+                        return Result.failure(it)
+                    }
                 else -> return Result.failure(TokenizeException.InvalidChar(char))
             }
         }
