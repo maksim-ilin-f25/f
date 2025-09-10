@@ -45,6 +45,8 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
+tasks.run { standardInput = System.`in` }
+
 val compileKotlin: KotlinCompile by tasks
 
 compileKotlin.compilerOptions { freeCompilerArgs.set(listOf("-Xwhen-guards")) }
