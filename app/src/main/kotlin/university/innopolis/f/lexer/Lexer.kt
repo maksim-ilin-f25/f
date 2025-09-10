@@ -102,7 +102,7 @@ private class Lexer() {
 }
 
 fun main() {
-    val sourceCode = "(1 2.0 hello true null ')"
+    val sourceCode = "(cond 1 2.0 hello true null ')"
     val result = tokenize(sourceCode)
     println(result)
 }
