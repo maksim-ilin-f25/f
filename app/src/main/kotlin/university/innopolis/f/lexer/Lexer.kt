@@ -1,17 +1,16 @@
 package university.innopolis.f.lexer
 
-import java.io.ByteArrayInputStream
-import java.io.InputStream
 import university.innopolis.f.utils.CharUtils.isAsciiDigit
 import university.innopolis.f.utils.CharUtils.isAsciiLetter
 
-class Lexer() {
+public fun tokenize(sourceCode: String): Result<List<FToken>> = Lexer().tokenize(sourceCode)
+
+private class Lexer() {
     private val tokenBuffer = emptyList<FToken>().toMutableList()
     private var currentTokenState = CurrentTokenState()
 
-    fun tokenize(sourceCode: InputStream): Result<List<FToken>> {
-        val code = sourceCode.bufferedReader().use { it.readText() }
-        for (char in code) {
+    fun tokenize(sourceCode: String): Result<List<FToken>> {
+        for (char in sourceCode) {
             when {
                 char == '(' -> processOpeningParenthesis()
                 char == ')' -> processClosingParenthesis()
@@ -105,6 +104,6 @@ class Lexer() {
 
 fun main() {
     val sourceCode = "(1 2.0 hello true null ')"
-    val result = Lexer().tokenize(ByteArrayInputStream(sourceCode.toByteArray(Charsets.UTF_8)))
+    val result = tokenize(sourceCode)
     println(result)
 }
