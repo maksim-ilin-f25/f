@@ -1,9 +1,9 @@
 package university.innopolis.f.lexer
 
-import university.innopolis.f.utils.CharUtils.isAsciiDigit
-import university.innopolis.f.utils.CharUtils.isAsciiLetter
 import java.io.ByteArrayInputStream
 import java.io.InputStream
+import university.innopolis.f.utils.CharUtils.isAsciiDigit
+import university.innopolis.f.utils.CharUtils.isAsciiLetter
 
 class Lexer() {
     private val tokenBuffer = emptyList<FToken>().toMutableList()
