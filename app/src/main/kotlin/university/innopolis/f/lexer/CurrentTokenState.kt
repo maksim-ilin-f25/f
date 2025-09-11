@@ -17,7 +17,17 @@ data class CurrentTokenState(private var _rawValue: String = "") {
 
     fun isEmpty() = _rawValue.isEmpty()
 
-    fun canAddDot() = _rawValue.all { it.isAsciiDigit() } && this.isNotEmpty()
+    fun canAddDot(): Boolean {
+        val withoutSign = this.isNotEmpty() && this.rawValue.all { it.isAsciiDigit() }
+        val withSign =
+            runCatching {
+                    this.rawValue.first() in listOf('-', '+') &&
+                        this.rawValue.substring(1).all { it.isAsciiDigit() }
+                }
+                .getOrElse { false }
+
+        return withoutSign || withSign
+    }
 
     fun canAddLetter() = _rawValue.firstOrNull()?.isAsciiLetter() ?: true
 
