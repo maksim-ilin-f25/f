@@ -16,35 +16,43 @@ private class Lexer() {
                     processOpeningParenthesis().getOrElse {
                         return Result.failure(it)
                     }
+
                 char == ')' ->
                     processClosingParenthesis().getOrElse {
                         return Result.failure(it)
                     }
+
                 char == '\'' ->
                     processQuote().getOrElse {
                         return Result.failure(it)
                     }
+
                 char == '+' ->
                     processPlus().getOrElse {
                         return Result.failure(it)
                     }
+
                 char == '-' ->
                     processMinus().getOrElse {
                         return Result.failure(it)
                     }
+
                 char == '.' ->
                     processDot().getOrElse {
                         return Result.failure(it)
                     }
+
                 char.isAsciiDigit() -> processDigit(char)
                 char.isAsciiLetter() ->
                     processLetter(char).getOrElse {
                         return Result.failure(it)
                     }
+
                 char.isWhitespace() ->
                     processWhitespace().getOrElse {
                         return Result.failure(it)
                     }
+
                 else -> return Result.failure(TokenizeException.InvalidChar(char))
             }
         }
@@ -52,19 +60,19 @@ private class Lexer() {
     }
 
     private fun processOpeningParenthesis(): Result<Unit> {
-        val result = this.addCurrentToken()
+        val result = this.addCurrentTokenIfNotEmpty()
         this.addToken(FToken.OpeningParenthesis)
         return result
     }
 
     private fun processClosingParenthesis(): Result<Unit> {
-        val result = this.addCurrentToken()
+        val result = this.addCurrentTokenIfNotEmpty()
         this.addToken(FToken.ClosingParenthesis)
         return result
     }
 
     private fun processQuote(): Result<Unit> {
-        val result = this.addCurrentToken()
+        val result = this.addCurrentTokenIfNotEmpty()
         this.addToken(FToken.Quote)
         return result
     }
@@ -108,14 +116,18 @@ private class Lexer() {
     }
 
     private fun processWhitespace(): Result<Unit> {
-        return addCurrentToken()
+        return addCurrentTokenIfNotEmpty()
     }
 
-    private fun addCurrentToken(): Result<Unit> {
-        val token =
-            currentTokenState.build()
-                ?: return Result.failure(TokenizeException.InvalidToken(currentTokenState.rawValue))
-        this.addToken(token)
+    private fun addCurrentTokenIfNotEmpty(): Result<Unit> {
+        if (currentTokenState.isNotEmpty()) {
+            val token =
+                this.currentTokenState.build()
+                    ?: return Result.failure(
+                        TokenizeException.InvalidToken(currentTokenState.rawValue)
+                    )
+            this.addToken(token)
+        }
         return Result.success(Unit)
     }
 
