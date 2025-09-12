@@ -1,0 +1,1 @@
+((lambda (num) (return (plus num 1))) 20)

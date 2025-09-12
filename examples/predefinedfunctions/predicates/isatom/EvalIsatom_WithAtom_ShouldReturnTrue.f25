@@ -1,0 +1,2 @@
+(setq atom 5)
+(isatom atom)
