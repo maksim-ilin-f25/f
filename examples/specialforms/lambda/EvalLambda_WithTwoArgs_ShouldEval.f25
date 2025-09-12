@@ -1,1 +1,1 @@
-(println ((lambda (first second) (plus first second)) 21 89))
+((lambda (first second) (plus first second)) 21 89)

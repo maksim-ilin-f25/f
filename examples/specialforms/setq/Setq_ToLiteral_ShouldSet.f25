@@ -1,2 +1,2 @@
 (setq x 21)
-(println x)
+x

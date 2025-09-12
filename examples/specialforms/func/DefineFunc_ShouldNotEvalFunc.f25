@@ -1,1 +1,2 @@
-(func ShouldNotPrint () (println 1))
+(func shouldNotPrint ()
+    1)

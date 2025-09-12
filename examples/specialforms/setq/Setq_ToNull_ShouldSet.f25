@@ -1,2 +1,2 @@
 (setq x null)
-(println x)
+x

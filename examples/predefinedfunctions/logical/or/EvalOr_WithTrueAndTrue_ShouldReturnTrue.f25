@@ -1,1 +1,1 @@
-(println (or true true))
+(or true true)

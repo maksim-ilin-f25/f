@@ -1,1 +1,1 @@
-(lambda () (println 1))
+(lambda () 1)

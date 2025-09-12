@@ -1,7 +1,6 @@
-(func ComputeFactorial
-      (num)
-      (cond
-       (greater num 1)
-         (times num (ComputeFactorial (minus num 1)))
-         num))
-(println (ComputeFactorial 5))
+(func computeFactorial (num)
+    (cond (greater num 1)
+        (times num (computeFactorial (minus num 1)))
+        num))
+
+(computeFactorial 5)

@@ -1,1 +1,1 @@
-(println (xor false false))
+(xor false false)

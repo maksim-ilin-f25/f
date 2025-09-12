@@ -1,1 +1,1 @@
-(println (islist (0 1 2 3)))
+(islist '(0 1 2 3))

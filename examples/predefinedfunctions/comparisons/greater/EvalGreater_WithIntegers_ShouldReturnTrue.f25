@@ -1,1 +1,1 @@
-(print (greater 1 0))
+(greater 1 0)

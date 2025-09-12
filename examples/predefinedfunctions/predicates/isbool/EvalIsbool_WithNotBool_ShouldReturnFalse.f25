@@ -1,1 +1,1 @@
-(println (isbool 1))
+(isbool 1)

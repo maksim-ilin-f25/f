@@ -1,1 +1,1 @@
-(println (isreal 1))
+(isreal 1)

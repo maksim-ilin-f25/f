@@ -1,2 +1,4 @@
-(func ComputeAge (year) (minus year 2005))
-(println (ComputeAge 2025))
+(func computeAge (year)
+    (minus year 2005))
+
+(computeAge 2025)

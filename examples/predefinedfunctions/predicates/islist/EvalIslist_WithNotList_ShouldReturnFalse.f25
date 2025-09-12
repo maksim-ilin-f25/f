@@ -1,1 +1,1 @@
-(println (islist 1))
+(islist 1)

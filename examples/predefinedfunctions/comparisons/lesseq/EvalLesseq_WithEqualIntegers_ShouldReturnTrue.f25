@@ -1,1 +1,1 @@
-(print (lesseq 1 1))
+(lesseq 1 1)

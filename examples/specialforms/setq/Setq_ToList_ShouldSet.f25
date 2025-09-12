@@ -1,2 +1,2 @@
 (setq x '(plus 20 1))
-(println x)
+x

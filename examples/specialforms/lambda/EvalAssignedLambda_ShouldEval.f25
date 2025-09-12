@@ -1,2 +1,2 @@
-(setq GetProduct (lambda (first second) (times first second)))
-(println (GetProduct 3 7))
+(setq getProduct (lambda (first second) (times first second)))
+(getProduct 3 7)

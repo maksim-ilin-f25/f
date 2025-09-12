@@ -1,2 +1,2 @@
 (setq shadow 1)
-(println ((lambda (shadow) shadow) 0))
+((lambda (shadow) shadow) 0)

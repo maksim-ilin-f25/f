@@ -2,6 +2,5 @@
 (setq count 0)
 (while (less i 2)
     (setq count i)
-    (setq i (plus i 1))
-)
-(println count)
+    (setq i (plus i 1)))
+count

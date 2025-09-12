@@ -1,2 +1,2 @@
 (setq atom 5)
-(println (isatom atom))
+(isatom atom)

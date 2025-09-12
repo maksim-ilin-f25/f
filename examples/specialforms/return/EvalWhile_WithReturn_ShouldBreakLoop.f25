@@ -1,1 +1,3 @@
-(println (lambda () (while (true) (return 0))))
+(lambda ()
+    (while (true)
+        (return 0)))

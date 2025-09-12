@@ -1,1 +1,1 @@
-(println ((lambda (num) (return (plus num 1))) 20))
+((lambda (num) (return (plus num 1))) 20)

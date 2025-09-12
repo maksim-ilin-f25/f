@@ -1,1 +1,1 @@
-(print (nonequal 1 1))
+(nonequal 1 1)

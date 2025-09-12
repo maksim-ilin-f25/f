@@ -1,2 +1,4 @@
-(func GetBirthday () (2 8 2005))
-(println (GetBirthday))
+(func getBirthday ()
+    '(2005 8 2))
+
+(getBirthday)

@@ -1,3 +1,6 @@
 (setq shadow 1)
-(func ShadowingFunc (shadow) shadow)
-(println (ShadowingFunc 0))
+
+(func shadowingFunc (shadow)
+    shadow)
+
+(shadowingFunc 0)
