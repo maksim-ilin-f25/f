@@ -7,6 +7,7 @@ fun tokenize(sourceCode: String): Result<List<FToken>> = Lexer().tokenize(source
 
 private class Lexer() {
     private val tokenBuffer = emptyList<FToken>().toMutableList()
+    private val errors = TokenizeException()
     private var currentTokenState = CurrentTokenState()
 
     fun tokenize(sourceCode: String): Result<List<FToken>> {
@@ -14,49 +15,46 @@ private class Lexer() {
             when {
                 char == '(' ->
                     processOpeningParenthesis().getOrElse {
-                        return Result.failure(it)
+                        this.errors.addError(it as InvalidTokenException)
                     }
 
                 char == ')' ->
                     processClosingParenthesis().getOrElse {
-                        return Result.failure(it)
+                        this.errors.addError(it as InvalidTokenException)
                     }
 
                 char == '\'' ->
-                    processQuote().getOrElse {
-                        return Result.failure(it)
-                    }
+                    processQuote().getOrElse { this.errors.addError(it as InvalidTokenException) }
 
                 char == '+' ->
-                    processPlus().getOrElse {
-                        return Result.failure(it)
-                    }
+                    processPlus().getOrElse { this.errors.addError(it as InvalidTokenException) }
 
                 char == '-' ->
-                    processMinus().getOrElse {
-                        return Result.failure(it)
-                    }
+                    processMinus().getOrElse { this.errors.addError(it as InvalidTokenException) }
 
                 char == '.' ->
-                    processDot().getOrElse {
-                        return Result.failure(it)
-                    }
+                    processDot().getOrElse { this.errors.addError(it as InvalidTokenException) }
 
                 char.isAsciiDigit() -> processDigit(char)
                 char.isAsciiLetter() ->
                     processLetter(char).getOrElse {
-                        return Result.failure(it)
+                        this.errors.addError(it as InvalidTokenException)
                     }
 
                 char.isWhitespace() ->
                     processWhitespace().getOrElse {
-                        return Result.failure(it)
+                        this.errors.addError(it as InvalidTokenException)
                     }
 
-                else -> return Result.failure(TokenizeException.InvalidChar(char))
+                else -> this.errors.addError(InvalidTokenException.UnsupportedCharacter(char))
             }
         }
-        return Result.success(tokenBuffer)
+
+        return if (this.errors.isEmpty()) {
+            Result.success(this.tokenBuffer)
+        } else {
+            Result.failure(this.errors)
+        }
     }
 
     private fun processOpeningParenthesis(): Result<Unit> {
@@ -82,7 +80,7 @@ private class Lexer() {
             currentTokenState.add('+')
             Result.success(Unit)
         } else {
-            Result.failure(TokenizeException.UnexpectedChar('+'))
+            Result.failure(InvalidTokenException.UnexpectedForm('+'))
         }
     }
 
@@ -91,13 +89,13 @@ private class Lexer() {
             currentTokenState.add('-')
             Result.success(Unit)
         } else {
-            Result.failure(TokenizeException.UnexpectedChar('-'))
+            Result.failure(InvalidTokenException.UnexpectedForm('-'))
         }
     }
 
     private fun processDot(): Result<Unit> {
         if (!currentTokenState.canAddDot()) {
-            return Result.failure(TokenizeException.UnexpectedChar('.'))
+            return Result.failure(InvalidTokenException.UnexpectedForm('.'))
         }
         currentTokenState.add('.')
         return Result.success(Unit)
@@ -109,7 +107,7 @@ private class Lexer() {
 
     private fun processLetter(letter: Char): Result<Unit> {
         if (!currentTokenState.canAddLetter()) {
-            return Result.failure(TokenizeException.UnexpectedChar(letter))
+            return Result.failure(InvalidTokenException.UnexpectedForm(letter))
         }
         currentTokenState.add(letter)
         return Result.success(Unit)
@@ -124,7 +122,7 @@ private class Lexer() {
             val token =
                 this.currentTokenState.build()
                     ?: return Result.failure(
-                        TokenizeException.InvalidToken(currentTokenState.rawValue)
+                        InvalidTokenException.Build(currentTokenState.rawValue)
                     )
             this.addToken(token)
         }
