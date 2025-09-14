@@ -1,3 +1,2 @@
-(prog ()
-    (setq num (plus 20 1))
+(prog (num (plus 20 1))
     (return num))
