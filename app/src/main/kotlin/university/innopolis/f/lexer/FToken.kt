@@ -29,5 +29,3 @@ sealed class FToken() {
         override fun toString() = "Quote"
     }
 }
-
-data class TokenCoordinate(val line: UInt, val column: UInt)

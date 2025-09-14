@@ -13,16 +13,17 @@ class TokenizeException(
     override fun toString() = this.errors.joinToString("\n") { "- $it" }
 }
 
-sealed class InvalidTokenException : IllegalArgumentException() {
-    class UnsupportedCharacter(val c: Char) : InvalidTokenException() {
-        override fun toString() = "Unsupported character: $c"
+sealed class InvalidTokenException(coordinate: Coordinate) : IllegalArgumentException() {
+    class UnsupportedCharacter(val c: Char, val coordinate: Coordinate) :
+        InvalidTokenException(coordinate) {
+        override fun toString() = "$coordinate: Unsupported character: $c"
     }
 
-    class UnexpectedForm(val c: Char) : InvalidTokenException() {
-        override fun toString() = "Unexpected character: $c"
+    class UnexpectedForm(val c: Char, val coordinate: Coordinate) : InvalidTokenException(coordinate) {
+        override fun toString() = "$coordinate: Unexpected character: $c"
     }
 
-    class Build(val token: String) : InvalidTokenException() {
-        override fun toString() = "Invalid token: $token"
+    class Build(val token: String, val coordinate: Coordinate) : InvalidTokenException(coordinate) {
+        override fun toString() = "$coordinate: Invalid token: $token"
     }
 }

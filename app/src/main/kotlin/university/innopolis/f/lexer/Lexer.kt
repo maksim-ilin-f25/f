@@ -8,10 +8,14 @@ fun tokenize(sourceCode: String): Result<List<FToken>> = Lexer().tokenize(source
 private class Lexer() {
     private val tokenBuffer = emptyList<FToken>().toMutableList()
     private val errors = TokenizeException()
-    private var currentTokenState = CurrentTokenState()
+    private var currentTokenState = CurrentTokenState(startCoordinate = Coordinate())
+    private val currentCoordinate = Coordinate()
 
     fun tokenize(sourceCode: String): Result<List<FToken>> {
         for (char in sourceCode) {
+            if (currentTokenState.isEmpty()) {
+                currentTokenState = currentTokenState.copy(startCoordinate = currentCoordinate.copy())
+            }
             when {
                 char == '(' ->
                     processOpeningParenthesis().getOrElse {
@@ -41,13 +45,26 @@ private class Lexer() {
                         this.errors.addError(it as InvalidTokenException)
                     }
 
-                char.isWhitespace() ->
+                char.isWhitespace() -> {
                     processWhitespace().getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
+                }
 
-                else -> this.errors.addError(InvalidTokenException.UnsupportedCharacter(char))
+                else ->
+                    this.errors.addError(
+                        InvalidTokenException.UnsupportedCharacter(
+                            char,
+                            currentTokenState.startCoordinate,
+                        )
+                    )
             }
+                if (char == '\n') {
+                    currentCoordinate.incrementLine()
+                    currentCoordinate.clearColumn()
+                } else {
+                    currentCoordinate.incrementColumn()
+                }
         }
 
         return if (this.errors.isEmpty()) {
@@ -80,7 +97,9 @@ private class Lexer() {
             currentTokenState.add('+')
             Result.success(Unit)
         } else {
-            Result.failure(InvalidTokenException.UnexpectedForm('+'))
+            Result.failure(
+                InvalidTokenException.UnexpectedForm('+', currentTokenState.startCoordinate)
+            )
         }
     }
 
@@ -89,13 +108,17 @@ private class Lexer() {
             currentTokenState.add('-')
             Result.success(Unit)
         } else {
-            Result.failure(InvalidTokenException.UnexpectedForm('-'))
+            Result.failure(
+                InvalidTokenException.UnexpectedForm('-', currentTokenState.startCoordinate)
+            )
         }
     }
 
     private fun processDot(): Result<Unit> {
         if (!currentTokenState.canAddDot()) {
-            return Result.failure(InvalidTokenException.UnexpectedForm('.'))
+            return Result.failure(
+                InvalidTokenException.UnexpectedForm('.', currentTokenState.startCoordinate)
+            )
         }
         currentTokenState.add('.')
         return Result.success(Unit)
@@ -107,7 +130,9 @@ private class Lexer() {
 
     private fun processLetter(letter: Char): Result<Unit> {
         if (!currentTokenState.canAddLetter()) {
-            return Result.failure(InvalidTokenException.UnexpectedForm(letter))
+            return Result.failure(
+                InvalidTokenException.UnexpectedForm(letter, currentTokenState.startCoordinate)
+            )
         }
         currentTokenState.add(letter)
         return Result.success(Unit)
@@ -122,7 +147,10 @@ private class Lexer() {
             val token =
                 this.currentTokenState.build()
                     ?: return Result.failure(
-                        InvalidTokenException.Build(currentTokenState.rawValue)
+                        InvalidTokenException.Build(
+                            currentTokenState.rawValue,
+                            currentTokenState.startCoordinate,
+                        )
                     )
             this.addToken(token)
         }
