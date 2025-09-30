@@ -12,8 +12,8 @@ sealed class FToken() {
         override fun toString() = "ClosingParenthesis"
     }
 
-    data class Identifier(val name: FAtom) : FToken() {
-        override fun toString() = this.name.toString()
+    data class Atom(val value: FAtom) : FToken() {
+        override fun toString() = this.value.toString()
     }
 
     data class Literal(val value: FLiteral) : FToken() {

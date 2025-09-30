@@ -5,7 +5,7 @@ import university.innopolis.f.utils.CharUtils.isAsciiLetter
 
 fun tokenize(sourceCode: String): Result<List<FToken>> = Lexer().tokenize(sourceCode)
 
-private class Lexer() {
+private class Lexer {
     private val tokenBuffer = emptyList<FToken>().toMutableList()
     private val errors = TokenizeException()
     private var currentTokenState = CurrentTokenState(startCoordinate = Coordinate())

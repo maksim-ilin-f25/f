@@ -47,7 +47,7 @@ data class CurrentTokenState(private var _rawValue: String = "", val startCoordi
                     "true" -> FToken.Literal(FLiteral.Boolean(FBoolean(true)))
                     "false" -> FToken.Literal(FLiteral.Boolean(FBoolean(false)))
                     "null" -> FToken.Literal(FLiteral.Null)
-                    else -> FToken.Identifier(FAtom(_rawValue))
+                    else -> FToken.Atom(FAtom(_rawValue))
                 }
             }
             else -> null
