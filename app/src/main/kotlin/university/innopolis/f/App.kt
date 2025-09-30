@@ -4,8 +4,8 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.inputStream
-import kotlin.system.exitProcess
 import university.innopolis.f.lexer.tokenize
+import kotlin.system.exitProcess
 
 class App : CliktCommand() {
     val input by argument(help = "Path to the file to run or '-' (read from stdin)").inputStream()
