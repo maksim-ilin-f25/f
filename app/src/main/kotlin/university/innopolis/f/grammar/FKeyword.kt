@@ -1,6 +1,6 @@
-package university.innopolis.f.lexer.model
+package university.innopolis.f.grammar
 
-enum class FSpecialForm(val string: String) {
+enum class FKeyword(val string: String) {
     QUOTE("quote"),
     SETQ("setq"),
     FUNC("func"),
@@ -14,8 +14,8 @@ enum class FSpecialForm(val string: String) {
     override fun toString() = "SpecialForm.${this.string}"
 
     companion object {
-        fun fromString(string: String): FSpecialForm? {
-            return entries.firstOrNull { it.string == string }
+        fun fromAtom(atom: FAtom): FKeyword? {
+            return entries.firstOrNull { it.string == atom.name }
         }
     }
 }

@@ -1,14 +1,10 @@
 package university.innopolis.f.lexer
 
 import university.innopolis.f.grammar.*
-import university.innopolis.f.lexer.model.FSpecialForm
 import university.innopolis.f.utils.CharUtils.isAsciiDigit
 import university.innopolis.f.utils.CharUtils.isAsciiLetter
 
-data class CurrentTokenState(
-    private var _rawValue: String = "",
-    val startCoordinate: Coordinate,
-) {
+data class CurrentTokenState(private var _rawValue: String = "", val startCoordinate: Coordinate) {
     val rawValue
         get() = _rawValue
 
@@ -51,14 +47,7 @@ data class CurrentTokenState(
                     "true" -> FToken.Literal(FLiteral.Boolean(FBoolean(true)))
                     "false" -> FToken.Literal(FLiteral.Boolean(FBoolean(false)))
                     "null" -> FToken.Literal(FLiteral.Null)
-                    else -> {
-                        val specialForm = FSpecialForm.fromString(_rawValue)
-                        if (specialForm != null) {
-                            FToken.SpecialForm(specialForm)
-                        } else {
-                            FToken.Identifier(FIdentifier(_rawValue))
-                        }
-                    }
+                    else -> FToken.Identifier(FAtom(_rawValue))
                 }
             }
             else -> null
