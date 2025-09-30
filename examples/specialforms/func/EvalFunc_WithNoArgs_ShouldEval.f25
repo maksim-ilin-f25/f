@@ -1,0 +1,4 @@
+(func getBirthday ()
+    '(2005 8 2))
+
+(getBirthday)

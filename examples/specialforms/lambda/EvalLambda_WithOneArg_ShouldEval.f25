@@ -1,0 +1,1 @@
+((lambda (year) (minus year 2005)) 2025)

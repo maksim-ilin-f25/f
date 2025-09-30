@@ -1,0 +1,4 @@
+(setq a 0)
+(while (greater 1 2)
+    (setq a 1))
+a

@@ -1,0 +1,7 @@
+(setq i 1)
+(setq count 0)
+(while (less i 2) (prog ()
+    (setq count i)
+    (setq i (plus i 1)))
+)
+count

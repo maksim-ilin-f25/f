@@ -1,0 +1,5 @@
+(setq shadow 0)
+(prog ((shadow shadow))
+    (setq shadow 1)
+    shadow)
+shadow
