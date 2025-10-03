@@ -11,7 +11,7 @@ enum class FKeyword(val string: String) {
     RETURN("return"),
     BREAK("break");
 
-    override fun toString() = "SpecialForm.${this.string}"
+    override fun toString() = "Keyword.${this.string}"
 
     companion object {
         fun fromAtom(atom: FAtom): FKeyword? {

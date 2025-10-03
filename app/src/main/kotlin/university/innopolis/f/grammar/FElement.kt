@@ -7,5 +7,7 @@ sealed class FElement {
 
     data class List(val value: FList) : FElement()
 
-    class SpecialForm(val value: FSpecialForm) : FElement()
+    data class Quote(val value: FElement) : FElement()
+
+    data class Keyword(val value: FKeyword) : FElement()
 }

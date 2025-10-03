@@ -1,6 +1,7 @@
 package university.innopolis.f.lexer
 
 import university.innopolis.f.grammar.FAtom
+import university.innopolis.f.grammar.FKeyword
 import university.innopolis.f.grammar.FLiteral
 
 sealed class FToken() {
@@ -10,6 +11,10 @@ sealed class FToken() {
 
     object ClosingParenthesis : FToken() {
         override fun toString() = "ClosingParenthesis"
+    }
+
+    data class Keyword(val value: FKeyword) : FToken() {
+        override fun toString() = this.value.toString()
     }
 
     data class Atom(val value: FAtom) : FToken() {
