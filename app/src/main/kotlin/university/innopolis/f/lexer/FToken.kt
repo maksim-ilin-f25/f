@@ -1,8 +1,8 @@
 package university.innopolis.f.lexer
 
-import university.innopolis.f.grammar.FIdentifier
+import university.innopolis.f.grammar.FAtom
+import university.innopolis.f.grammar.FKeyword
 import university.innopolis.f.grammar.FLiteral
-import university.innopolis.f.lexer.model.FSpecialForm
 
 sealed class FToken() {
     object OpeningParenthesis : FToken() {
@@ -13,16 +13,16 @@ sealed class FToken() {
         override fun toString() = "ClosingParenthesis"
     }
 
-    data class Identifier(val name: FIdentifier) : FToken() {
-        override fun toString() = this.name.toString()
+    data class Keyword(val value: FKeyword) : FToken() {
+        override fun toString() = this.value.toString()
+    }
+
+    data class Atom(val value: FAtom) : FToken() {
+        override fun toString() = this.value.toString()
     }
 
     data class Literal(val value: FLiteral) : FToken() {
         override fun toString() = this.value.toString()
-    }
-
-    data class SpecialForm(val name: FSpecialForm) : FToken() {
-        override fun toString() = this.name.toString()
     }
 
     object Quote : FToken() {

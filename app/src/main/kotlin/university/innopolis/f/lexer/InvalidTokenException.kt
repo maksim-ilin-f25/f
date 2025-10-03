@@ -19,7 +19,8 @@ sealed class InvalidTokenException(coordinate: Coordinate) : IllegalArgumentExce
         override fun toString() = "$coordinate: Unsupported character: $c"
     }
 
-    class UnexpectedForm(val c: Char, val coordinate: Coordinate) : InvalidTokenException(coordinate) {
+    class UnexpectedForm(val c: Char, val coordinate: Coordinate) :
+        InvalidTokenException(coordinate) {
         override fun toString() = "$coordinate: Unexpected character: $c"
     }
 
