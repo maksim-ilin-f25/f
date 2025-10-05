@@ -24,7 +24,8 @@ sealed class InvalidTokenException(open val coordinate: Coordinate) : IllegalArg
         override fun toString() = "$coordinate: Unexpected character: $c"
     }
 
-    class Build(val token: String, override val coordinate: Coordinate) : InvalidTokenException(coordinate) {
+    class Build(val token: String, override val coordinate: Coordinate) :
+        InvalidTokenException(coordinate) {
         override fun toString() = "$coordinate: Invalid token: $token"
     }
 }

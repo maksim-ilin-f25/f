@@ -13,7 +13,8 @@ sealed class FToken(open val coordinate: Coordinate) {
         override fun toString() = "ClosingParenthesis"
     }
 
-    data class Keyword(val value: FKeyword, override val coordinate: Coordinate) : FToken(coordinate) {
+    data class Keyword(val value: FKeyword, override val coordinate: Coordinate) :
+        FToken(coordinate) {
         override fun toString() = this.value.toString()
     }
 
@@ -21,7 +22,8 @@ sealed class FToken(open val coordinate: Coordinate) {
         override fun toString() = this.value.toString()
     }
 
-    data class Literal(val value: FLiteral, override val coordinate: Coordinate) : FToken(coordinate) {
+    data class Literal(val value: FLiteral, override val coordinate: Coordinate) :
+        FToken(coordinate) {
         override fun toString() = this.value.toString()
     }
 

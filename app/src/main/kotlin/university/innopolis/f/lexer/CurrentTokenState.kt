@@ -37,7 +37,10 @@ data class CurrentTokenState(private var _rawValue: String = "", val startCoordi
 
         return when {
             _rawValue.matches(integerRegex) -> {
-                FToken.Literal(FLiteral.Integer(FInteger(_rawValue.toBigInteger())), startCoordinate)
+                FToken.Literal(
+                    FLiteral.Integer(FInteger(_rawValue.toBigInteger())),
+                    startCoordinate,
+                )
             }
             _rawValue.matches(realRegex) -> {
                 FToken.Literal(FLiteral.Real(FReal(_rawValue.toBigDecimal())), startCoordinate)
