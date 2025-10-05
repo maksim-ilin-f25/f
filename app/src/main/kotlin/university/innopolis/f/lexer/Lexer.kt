@@ -5,7 +5,7 @@ import university.innopolis.f.utils.CharUtils.isAsciiLetter
 
 fun tokenize(sourceCode: String): Result<List<FToken>> = Lexer().tokenize(sourceCode)
 
-private class Lexer() {
+private class Lexer {
     private val tokenBuffer = emptyList<FToken>().toMutableList()
     private val errors = TokenizeException()
     private var currentTokenState = CurrentTokenState(startCoordinate = Coordinate())
@@ -14,7 +14,8 @@ private class Lexer() {
     fun tokenize(sourceCode: String): Result<List<FToken>> {
         for (char in sourceCode) {
             if (currentTokenState.isEmpty()) {
-                currentTokenState = currentTokenState.copy(startCoordinate = currentCoordinate.copy())
+                currentTokenState =
+                    currentTokenState.copy(startCoordinate = currentCoordinate.copy())
             }
             when {
                 char == '(' ->
@@ -59,12 +60,15 @@ private class Lexer() {
                         )
                     )
             }
-                if (char == '\n') {
-                    currentCoordinate.incrementLine()
-                    currentCoordinate.clearColumn()
-                } else {
-                    currentCoordinate.incrementColumn()
-                }
+            if (char == '\n') {
+                currentCoordinate.incrementLine()
+                currentCoordinate.clearColumn()
+            } else {
+                currentCoordinate.incrementColumn()
+            }
+        }
+        if (currentTokenState.isNotEmpty()) {
+            processWhitespace().getOrElse { this.errors.addError(it as InvalidTokenException) }
         }
 
         return if (this.errors.isEmpty()) {
