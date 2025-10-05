@@ -1,6 +1,12 @@
 package university.innopolis.f.lexer
 
 data class Coordinate(private var _line: UInt = 1u, private var _column: UInt = 1u) {
+    val line
+        get() = _line
+
+    val column
+        get() = _column
+
     override fun toString(): String = "$_line:$_column"
 
     fun clearColumn() {

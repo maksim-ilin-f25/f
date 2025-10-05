@@ -19,17 +19,17 @@ private class Lexer {
             }
             when {
                 char == '(' ->
-                    processOpeningParenthesis().getOrElse {
+                    processOpeningParenthesis(currentCoordinate).getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
 
                 char == ')' ->
-                    processClosingParenthesis().getOrElse {
+                    processClosingParenthesis(currentCoordinate).getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
 
                 char == '\'' ->
-                    processQuote().getOrElse { this.errors.addError(it as InvalidTokenException) }
+                    processQuote(currentCoordinate).getOrElse { this.errors.addError(it as InvalidTokenException) }
 
                 char == '+' ->
                     processPlus().getOrElse { this.errors.addError(it as InvalidTokenException) }
@@ -78,21 +78,21 @@ private class Lexer {
         }
     }
 
-    private fun processOpeningParenthesis(): Result<Unit> {
+    private fun processOpeningParenthesis(currentCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.OpeningParenthesis)
+        this.addToken(FToken.OpeningParenthesis(currentCoordinate))
         return result
     }
 
-    private fun processClosingParenthesis(): Result<Unit> {
+    private fun processClosingParenthesis(currentCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.ClosingParenthesis)
+        this.addToken(FToken.ClosingParenthesis(currentCoordinate))
         return result
     }
 
-    private fun processQuote(): Result<Unit> {
+    private fun processQuote(currentCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.Quote)
+        this.addToken(FToken.Quote(currentCoordinate))
         return result
     }
 

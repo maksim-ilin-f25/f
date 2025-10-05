@@ -37,23 +37,23 @@ data class CurrentTokenState(private var _rawValue: String = "", val startCoordi
 
         return when {
             _rawValue.matches(integerRegex) -> {
-                FToken.Literal(FLiteral.Integer(FInteger(_rawValue.toBigInteger())))
+                FToken.Literal(FLiteral.Integer(FInteger(_rawValue.toBigInteger())), startCoordinate)
             }
             _rawValue.matches(realRegex) -> {
-                FToken.Literal(FLiteral.Real(FReal(_rawValue.toBigDecimal())))
+                FToken.Literal(FLiteral.Real(FReal(_rawValue.toBigDecimal())), startCoordinate)
             }
             _rawValue.matches(identifierRegex) -> {
                 when (_rawValue) {
-                    "true" -> FToken.Literal(FLiteral.Boolean(FBoolean(true)))
-                    "false" -> FToken.Literal(FLiteral.Boolean(FBoolean(false)))
-                    "null" -> FToken.Literal(FLiteral.Null)
+                    "true" -> FToken.Literal(FLiteral.Boolean(FBoolean(true)), startCoordinate)
+                    "false" -> FToken.Literal(FLiteral.Boolean(FBoolean(false)), startCoordinate)
+                    "null" -> FToken.Literal(FLiteral.Null, startCoordinate)
                     else -> {
                         val atom = FAtom(_rawValue)
                         val maybeKeyword = FKeyword.fromAtom(atom)
                         if (maybeKeyword == null) {
-                            FToken.Atom(atom)
+                            FToken.Atom(atom, startCoordinate)
                         } else {
-                            FToken.Keyword(maybeKeyword)
+                            FToken.Keyword(maybeKeyword, startCoordinate)
                         }
                     }
                 }
