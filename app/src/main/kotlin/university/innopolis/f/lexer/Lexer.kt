@@ -18,40 +18,49 @@ private class Lexer {
                     currentTokenState.copy(startCoordinate = currentCoordinate.copy())
             }
             when {
-                char == '(' ->
-                    processOpeningParenthesis().getOrElse {
+                char == '(' -> {
+                    currentTokenState =
+                        currentTokenState.copy(startCoordinate = currentCoordinate.copy())
+                    processOpeningParenthesis(currentTokenState.startCoordinate).getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
-
-                char == ')' ->
-                    processClosingParenthesis().getOrElse {
+                }
+                char == ')' -> {
+                    currentTokenState =
+                        currentTokenState.copy(startCoordinate = currentCoordinate.copy())
+                    processClosingParenthesis(currentTokenState.startCoordinate).getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
-
-                char == '\'' ->
-                    processQuote().getOrElse { this.errors.addError(it as InvalidTokenException) }
-
-                char == '+' ->
+                }
+                char == '\'' -> {
+                    currentTokenState =
+                        currentTokenState.copy(startCoordinate = currentCoordinate.copy())
+                    processQuote(currentTokenState.startCoordinate).getOrElse {
+                        this.errors.addError(it as InvalidTokenException)
+                    }
+                }
+                char == '+' -> {
+                    currentTokenState =
+                        currentTokenState.copy(startCoordinate = currentCoordinate.copy())
                     processPlus().getOrElse { this.errors.addError(it as InvalidTokenException) }
-
-                char == '-' ->
+                }
+                char == '-' -> {
+                    currentTokenState =
+                        currentTokenState.copy(startCoordinate = currentCoordinate.copy())
                     processMinus().getOrElse { this.errors.addError(it as InvalidTokenException) }
-
+                }
                 char == '.' ->
                     processDot().getOrElse { this.errors.addError(it as InvalidTokenException) }
-
                 char.isAsciiDigit() -> processDigit(char)
                 char.isAsciiLetter() ->
                     processLetter(char).getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
-
                 char.isWhitespace() -> {
                     processWhitespace().getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
                 }
-
                 else ->
                     this.errors.addError(
                         InvalidTokenException.UnsupportedCharacter(
@@ -78,21 +87,21 @@ private class Lexer {
         }
     }
 
-    private fun processOpeningParenthesis(): Result<Unit> {
+    private fun processOpeningParenthesis(startCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.OpeningParenthesis)
+        this.addToken(FToken.OpeningParenthesis(startCoordinate))
         return result
     }
 
-    private fun processClosingParenthesis(): Result<Unit> {
+    private fun processClosingParenthesis(startCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.ClosingParenthesis)
+        this.addToken(FToken.ClosingParenthesis(startCoordinate))
         return result
     }
 
-    private fun processQuote(): Result<Unit> {
+    private fun processQuote(startCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.Quote)
+        this.addToken(FToken.Quote(startCoordinate))
         return result
     }
 

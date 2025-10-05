@@ -1,5 +1,6 @@
 package university.innopolis.f.grammar
 
+import university.innopolis.f.lexer.Coordinate
 import university.innopolis.f.lexer.FToken
 import university.innopolis.f.parser.ParseException
 
@@ -13,9 +14,15 @@ value class FList(private val elements: MutableList<FElement>) {
             var res = Pair(firstElemIndex, true)
             while (res.second) {
                 res =
-                    parseElement(allTokens, res.first, self.elements).getOrElse {
-                        return Result.failure(it)
-                    }
+                    parseElement(
+                            allTokens = allTokens,
+                            currentElemIndex = res.first,
+                            buffer = self.elements,
+                            openParCoordinate = allTokens[firstElemIndex - 1].coordinate,
+                        )
+                        .getOrElse {
+                            return Result.failure(it)
+                        }
             }
 
             return Result.success(Pair(self, res.first))
@@ -25,10 +32,11 @@ value class FList(private val elements: MutableList<FElement>) {
             allTokens: List<FToken>,
             currentElemIndex: Int,
             buffer: MutableList<FElement>,
+            openParCoordinate: Coordinate,
         ): Result<Pair<Int, Boolean>> {
             val currentToken = allTokens.getOrNull(currentElemIndex)
             if (currentToken == null) {
-                return Result.failure(ParseException.UnmatchedOpeningParen())
+                return Result.failure(ParseException.UnmatchedOpeningParen(openParCoordinate))
             }
             when (currentToken) {
                 is FToken.OpeningParenthesis -> { // recursion
@@ -50,9 +58,10 @@ value class FList(private val elements: MutableList<FElement>) {
                 }
                 is FToken.Quote -> {
                     val res =
-                        parseElement(allTokens, currentElemIndex + 1, buffer).getOrElse {
-                            return Result.failure(it)
-                        }
+                        parseElement(allTokens, currentElemIndex + 1, buffer, openParCoordinate)
+                            .getOrElse {
+                                return Result.failure(it)
+                            }
                     buffer[buffer.lastIndex] = FElement.Quote(buffer.last())
                     return Result.success(res)
                 }

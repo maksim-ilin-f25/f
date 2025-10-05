@@ -44,7 +44,7 @@ class Parser {
                 return Result.success(nextIndex)
             }
             is FToken.ClosingParenthesis -> {
-                return Result.failure(ParseException.UnmatchedClosingParen())
+                return Result.failure(ParseException.UnmatchedClosingParen(currentToken.coordinate))
             }
             is FToken.Atom -> {
                 elements.add(FElement.Atom(currentToken.value))
