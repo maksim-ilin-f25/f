@@ -1,6 +1,7 @@
 package university.innopolis.f.grammar
 
 import university.innopolis.f.lexer.FToken
+import university.innopolis.f.parser.ParseException
 
 @JvmInline
 value class FList(private val elements: MutableList<FElement>) {
@@ -25,7 +26,10 @@ value class FList(private val elements: MutableList<FElement>) {
             currentElemIndex: Int,
             buffer: MutableList<FElement>,
         ): Result<Pair<Int, Boolean>> {
-            val currentToken = allTokens[currentElemIndex]
+            val currentToken = allTokens.getOrNull(currentElemIndex)
+            if (currentToken == null) {
+                return Result.failure(ParseException.UnmatchedOpeningParen())
+            }
             when (currentToken) {
                 is FToken.OpeningParenthesis -> { // recursion
                     val (listAst, nextIndex) =

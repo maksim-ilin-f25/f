@@ -3,13 +3,13 @@ package university.innopolis.f.parser
 import university.innopolis.f.grammar.FElement
 import university.innopolis.f.grammar.FList
 import university.innopolis.f.lexer.FToken
+import university.innopolis.f.lexer.TokenizeException
 import university.innopolis.f.lexer.tokenize
 
 fun parseToAst(sourceCode: String): Result<List<FElement>> {
     val tokens =
         tokenize(sourceCode).getOrElse {
-            // TODO: use a better error type
-            return Result.failure(it)
+            return Result.failure(ParseException.Tokenization(it as TokenizeException))
         }
     return Parser().parseToAst(tokens)
 }
@@ -44,8 +44,7 @@ class Parser {
                 return Result.success(nextIndex)
             }
             is FToken.ClosingParenthesis -> {
-                // TODO: change exception type
-                return Result.failure(Exception(""))
+                return Result.failure(ParseException.UnmatchedClosingParen())
             }
             is FToken.Atom -> {
                 elements.add(FElement.Atom(currentToken.value))
