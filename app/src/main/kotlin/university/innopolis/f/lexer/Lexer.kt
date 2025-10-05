@@ -80,23 +80,23 @@ private class Lexer {
         }
     }
 
-    private fun processOpeningParenthesis(currentCoordinate: Coordinate): Result<Unit> {
+    private fun processOpeningParenthesis(startCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.OpeningParenthesis(currentCoordinate))
+        this.addToken(FToken.OpeningParenthesis(startCoordinate))
         currentTokenState = currentTokenState.copy(startCoordinate = currentCoordinate.copy())
         return result
     }
 
-    private fun processClosingParenthesis(currentCoordinate: Coordinate): Result<Unit> {
+    private fun processClosingParenthesis(startCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.ClosingParenthesis(currentCoordinate))
+        this.addToken(FToken.ClosingParenthesis(startCoordinate))
         currentTokenState = currentTokenState.copy(startCoordinate = currentCoordinate.copy())
         return result
     }
 
-    private fun processQuote(currentCoordinate: Coordinate): Result<Unit> {
+    private fun processQuote(startCoordinate: Coordinate): Result<Unit> {
         val result = this.addCurrentTokenIfNotEmpty()
-        this.addToken(FToken.Quote(currentCoordinate))
+        this.addToken(FToken.Quote(startCoordinate))
         currentTokenState = currentTokenState.copy(startCoordinate = currentCoordinate.copy())
         return result
     }
