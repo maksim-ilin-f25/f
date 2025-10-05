@@ -17,22 +17,20 @@ fun parseToAst(sourceCode: String): Result<List<FElement>> {
 class Parser {
     val elements = emptyList<FElement>().toMutableList()
 
-    //    fun parseToAst(tokens: List<FToken>): Result<List<FElement>> {
-    //        for (token in tokens) {
-    //            when (token) {
-    //                is FToken.OpeningParenthesis -> {}
-    //                is FToken.ClosingParenthesis -> TODO()
-    //                is FToken.Atom -> elements.add(FElement.Atom(token.value))
-    //                is FToken.Literal -> elements.add(FElement.Literal(token.value))
-    //                is FToken.Quote -> TODO()
-    //            }
-    //        }
-    //        TODO()
-    //    }
+    fun parseToAst(tokens: List<FToken>): Result<List<FElement>> {
+        var index = 0
+        while (index in tokens.indices) {
+            index =
+                parseFirstElement(tokens, index).getOrElse {
+                    return Result.failure(it)
+                }
+        }
+        return Result.success(elements)
+    }
 
-    fun parseFirstElement(allTokens: List<FToken>, currentTokenIndex: Int): Result<Unit> {
+    fun parseFirstElement(allTokens: List<FToken>, currentTokenIndex: Int): Result<Int> {
         if (currentTokenIndex == allTokens.lastIndex + 1) {
-            return Result.success(Unit) // parsing finished
+            return Result.success(currentTokenIndex) // parsing finished
         }
 
         val currentToken = allTokens[currentTokenIndex]
@@ -43,9 +41,7 @@ class Parser {
                         return Result.failure(it)
                     }
                 elements.add(FElement.List(listAst))
-                parseFirstElement(allTokens, nextIndex).getOrElse {
-                    return Result.failure(it)
-                }
+                return Result.success(nextIndex)
             }
             is FToken.ClosingParenthesis -> {
                 // TODO: change exception type
@@ -53,31 +49,23 @@ class Parser {
             }
             is FToken.Atom -> {
                 elements.add(FElement.Atom(currentToken.value))
-                parseFirstElement(allTokens, currentTokenIndex + 1).getOrElse {
-                    return Result.failure(it)
-                }
             }
             is FToken.Literal -> {
                 elements.add(FElement.Literal(currentToken.value))
-                parseFirstElement(allTokens, currentTokenIndex + 1).getOrElse {
-                    return Result.failure(it)
-                }
             }
             is FToken.Quote -> {
-                parseFirstElement(allTokens, currentTokenIndex + 1).getOrElse {
-                    return Result.failure(it)
-                }
+                val index =
+                    parseFirstElement(allTokens, currentTokenIndex + 1).getOrElse {
+                        return Result.failure(it)
+                    }
                 elements[elements.lastIndex] = FElement.Quote(elements.last())
-                TODO("continue where??")
+                return Result.success(index)
             }
             is FToken.Keyword -> {
                 elements.add(FElement.Keyword(currentToken.value))
-                parseFirstElement(allTokens, currentTokenIndex + 1).getOrElse {
-                    return Result.failure(it)
-                }
             }
         }
 
-        return Result.success(Unit)
+        return Result.success(currentTokenIndex + 1)
     }
 }

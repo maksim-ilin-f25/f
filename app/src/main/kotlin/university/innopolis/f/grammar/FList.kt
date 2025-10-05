@@ -8,64 +8,56 @@ value class FList(private val elements: MutableList<FElement>) {
         /** On success, returns the index after the matching closing parenthesis. */
         fun parse(allTokens: List<FToken>, firstElemIndex: Int): Result<Pair<FList, Int>> {
             val self = FList(emptyList<FElement>().toMutableList())
-            val indexLeftOff =
-                parseElement(allTokens, firstElemIndex, self.elements).getOrElse {
-                    return Result.failure(it)
-                }
-            return Result.success(Pair(self, indexLeftOff))
+
+            var res = Pair(firstElemIndex, true)
+            while (res.second) {
+                res =
+                    parseElement(allTokens, res.first, self.elements).getOrElse {
+                        return Result.failure(it)
+                    }
+            }
+
+            return Result.success(Pair(self, res.first))
         }
 
         private fun parseElement(
             allTokens: List<FToken>,
             currentElemIndex: Int,
             buffer: MutableList<FElement>,
-        ): Result<Int> {
+        ): Result<Pair<Int, Boolean>> {
             val currentToken = allTokens[currentElemIndex]
             when (currentToken) {
                 is FToken.OpeningParenthesis -> { // recursion
                     val (listAst, nextIndex) =
-                        FList.parse(allTokens, currentElemIndex + 1).getOrElse {
+                        parse(allTokens, currentElemIndex + 1).getOrElse {
                             return Result.failure(it)
                         }
                     buffer.add(FElement.List(listAst))
-                    parseElement(allTokens, nextIndex, buffer).getOrElse {
-                        return Result.failure(it)
-                    }
+                    return Result.success(Pair(nextIndex, true))
                 }
                 is FToken.ClosingParenthesis -> { // exit success
-                    return Result.success(currentElemIndex + 1)
+                    return Result.success(Pair(currentElemIndex + 1, false))
                 }
                 is FToken.Atom -> {
                     buffer.add(FElement.Atom(currentToken.value))
-                    parseElement(allTokens, currentElemIndex + 1, buffer).getOrElse {
-                        return Result.failure(it)
-                    }
                 }
                 is FToken.Literal -> {
                     buffer.add(FElement.Literal(currentToken.value))
-                    parseElement(allTokens, currentElemIndex + 1, buffer).getOrElse {
-                        return Result.failure(it)
-                    }
                 }
                 is FToken.Quote -> {
-                    val indexLeftOff =
+                    val res =
                         parseElement(allTokens, currentElemIndex + 1, buffer).getOrElse {
                             return Result.failure(it)
                         }
                     buffer[buffer.lastIndex] = FElement.Quote(buffer.last())
-                    parseElement(allTokens, indexLeftOff, buffer).getOrElse {
-                        return Result.failure(it)
-                    }
+                    return Result.success(res)
                 }
                 is FToken.Keyword -> {
                     buffer.add(FElement.Keyword(currentToken.value))
-                    parseElement(allTokens, currentElemIndex + 1, buffer).getOrElse {
-                        return Result.failure(it)
-                    }
                 }
             }
 
-            return Result.success(currentElemIndex + 1)
+            return Result.success(Pair(currentElemIndex + 1, true))
         }
     }
 }
