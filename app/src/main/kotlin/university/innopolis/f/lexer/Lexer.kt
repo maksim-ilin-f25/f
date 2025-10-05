@@ -19,17 +19,19 @@ private class Lexer {
             }
             when {
                 char == '(' ->
-                    processOpeningParenthesis(currentCoordinate).getOrElse {
+                    processOpeningParenthesis(currentTokenState.startCoordinate).getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
 
                 char == ')' ->
-                    processClosingParenthesis(currentCoordinate).getOrElse {
+                    processClosingParenthesis(currentTokenState.startCoordinate).getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }
 
                 char == '\'' ->
-                    processQuote(currentCoordinate).getOrElse { this.errors.addError(it as InvalidTokenException) }
+                    processQuote(currentTokenState.startCoordinate).getOrElse {
+                        this.errors.addError(it as InvalidTokenException)
+                    }
 
                 char == '+' ->
                     processPlus().getOrElse { this.errors.addError(it as InvalidTokenException) }
