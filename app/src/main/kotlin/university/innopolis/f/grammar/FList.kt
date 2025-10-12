@@ -47,7 +47,7 @@ value class FList(private val _elements: MutableList<FElement>) {
 
             if (currentToken == null) {
                 if (isFirstRun) {
-                    return Result.success(Pair(currentElemIndex, true))
+                    return Result.success(Pair(currentElemIndex, false))
                 }
                 return Result.failure(ParseException.UnmatchedOpeningParen(openParCoordinate))
             }
