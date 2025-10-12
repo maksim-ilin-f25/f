@@ -11,7 +11,7 @@ fun parseToAst(sourceCode: String): Result<List<FElement>> {
             return Result.failure(ParseException.Tokenization(it as TokenizeException))
         }
     val (listAst, _) =
-        FList.parse(allTokens = tokens, 1, isFirstRun = true).getOrElse {
+        FList.parse(allTokens = tokens, 0, isFirstRun = true).getOrElse {
             return Result.failure(it)
         }
     return Result.success(listAst.elements)
