@@ -12,6 +12,10 @@ sealed class ParseException() : IllegalArgumentException() {
         override fun toString() = "$coordinate: Unmatched closing parenthesis"
     }
 
+    class InvalidFunCall(val coordinate: Coordinate) : ParseException() {
+        override fun toString() = "$coordinate: No function name provided"
+    }
+
     class Tokenization(val e: TokenizeException) : ParseException() {
         override fun toString() = "Tokenization error:\n$e"
     }

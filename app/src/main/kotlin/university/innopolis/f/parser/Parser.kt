@@ -40,7 +40,11 @@ class Parser {
                     FList.parse(allTokens, currentTokenIndex + 1).getOrElse {
                         return Result.failure(it)
                     }
-                elements.add(FElement.List(listAst))
+                val funCall = listAst.toFunCallOrNull()
+                if (funCall == null) {
+                    return Result.failure(ParseException.InvalidFunCall(currentToken.coordinate))
+                }
+                elements.add(funCall)
                 return Result.success(nextIndex)
             }
             is FToken.ClosingParenthesis -> {
@@ -53,11 +57,12 @@ class Parser {
                 elements.add(FElement.Literal(currentToken.value))
             }
             is FToken.Quote -> {
+                TODO()
                 val index =
                     parseFirstElement(allTokens, currentTokenIndex + 1).getOrElse {
                         return Result.failure(it)
                     }
-                elements[elements.lastIndex] = FElement.Quote(elements.last())
+//                elements[elements.lastIndex] = FElement.Quote(elements.last())
                 return Result.success(index)
             }
             is FToken.Keyword -> {
