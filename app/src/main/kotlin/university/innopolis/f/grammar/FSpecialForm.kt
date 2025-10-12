@@ -1,7 +1,7 @@
 package university.innopolis.f.grammar
 
 sealed class FSpecialForm {
-    class Quote(val contents: FQuoteElement) : FSpecialForm()
+    class Quote(val contents: FElement.Quote) : FSpecialForm()
 
     class Setq(val name: FAtom, val value: FElement) : FSpecialForm()
 
