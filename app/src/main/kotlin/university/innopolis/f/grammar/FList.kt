@@ -5,10 +5,7 @@ import university.innopolis.f.lexer.FToken
 import university.innopolis.f.parser.ParseException
 
 @JvmInline
-value class FList(private val _elements: MutableList<FElement>) {
-    val elements: List<FElement>
-        get() = _elements
-
+value class FList(val elements: MutableList<FElement>) {
     companion object {
         /** On success, returns the index after the matching closing parenthesis. */
         fun parse(
@@ -24,7 +21,7 @@ value class FList(private val _elements: MutableList<FElement>) {
                     parseElement(
                             allTokens = allTokens,
                             currentElemIndex = res.first,
-                            buffer = self._elements,
+                            buffer = self.elements,
                             openParCoordinate = allTokens.getOrNull(firstElemIndex - 1)?.coordinate,
                             isFirstRun = isFirstRun,
                         )
