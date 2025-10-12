@@ -25,7 +25,7 @@ value class FList(private val _elements: MutableList<FElement>) {
                             allTokens = allTokens,
                             currentElemIndex = res.first,
                             buffer = self._elements,
-                            openParCoordinate = allTokens[firstElemIndex - 1].coordinate,
+                            openParCoordinate = allTokens.getOrNull(firstElemIndex - 1)?.coordinate,
                             isFirstRun = isFirstRun,
                         )
                         .getOrElse {
@@ -40,7 +40,7 @@ value class FList(private val _elements: MutableList<FElement>) {
             allTokens: List<FToken>,
             currentElemIndex: Int,
             buffer: MutableList<FElement>,
-            openParCoordinate: Coordinate,
+            openParCoordinate: Coordinate?,
             isFirstRun: Boolean,
         ): Result<Pair<Int, Boolean>> {
             val currentToken = allTokens.getOrNull(currentElemIndex)
@@ -49,7 +49,7 @@ value class FList(private val _elements: MutableList<FElement>) {
                 if (isFirstRun) {
                     return Result.success(Pair(currentElemIndex, false))
                 }
-                return Result.failure(ParseException.UnmatchedOpeningParen(openParCoordinate))
+                return Result.failure(ParseException.UnmatchedOpeningParen(openParCoordinate!!))
             }
             when (currentToken) {
                 is FToken.OpeningParenthesis -> { // recursion
