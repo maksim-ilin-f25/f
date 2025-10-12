@@ -21,14 +21,19 @@ class Parser {
         var index = 0
         while (index in tokens.indices) {
             index =
-                parseFirstElement(tokens, index).getOrElse {
-                    return Result.failure(it)
-                }
+                parseFirstElement(allTokens = tokens, currentTokenIndex = index, inQuote = false)
+                    .getOrElse {
+                        return Result.failure(it)
+                    }
         }
         return Result.success(elements)
     }
 
-    fun parseFirstElement(allTokens: List<FToken>, currentTokenIndex: Int): Result<Int> {
+    fun parseFirstElement(
+        allTokens: List<FToken>,
+        currentTokenIndex: Int,
+        inQuote: Boolean,
+    ): Result<Int> {
         if (currentTokenIndex == allTokens.lastIndex + 1) {
             return Result.success(currentTokenIndex) // parsing finished
         }
@@ -40,33 +45,54 @@ class Parser {
                     FList.parse(allTokens, currentTokenIndex + 1).getOrElse {
                         return Result.failure(it)
                     }
-                val funCall = listAst.toFunCallOrNull()
-                if (funCall == null) {
-                    return Result.failure(ParseException.InvalidFunCall(currentToken.coordinate))
+                if (inQuote) {
+                    elements.add(FElement.Quote.List(listAst))
+                } else {
+                    val funCall = listAst.toFunCallOrNull()
+                    if (funCall == null) {
+                        return Result.failure(
+                            ParseException.InvalidFunCall(currentToken.coordinate)
+                        )
+                    }
+                    elements.add(funCall)
                 }
-                elements.add(funCall)
                 return Result.success(nextIndex)
             }
             is FToken.ClosingParenthesis -> {
                 return Result.failure(ParseException.UnmatchedClosingParen(currentToken.coordinate))
             }
             is FToken.Atom -> {
-                elements.add(FElement.Atom(currentToken.value))
+                if (inQuote) {
+                    elements.add(FElement.Quote.Atom(currentToken.value))
+                } else {
+                    elements.add(FElement.Atom(currentToken.value))
+                }
             }
             is FToken.Literal -> {
-                elements.add(FElement.Literal(currentToken.value))
-            }
-            is FToken.Quote -> {
-                TODO()
-                val index =
-                    parseFirstElement(allTokens, currentTokenIndex + 1).getOrElse {
-                        return Result.failure(it)
-                    }
-//                elements[elements.lastIndex] = FElement.Quote(elements.last())
-                return Result.success(index)
+                if (inQuote) {
+                    elements.add(FElement.Quote.Literal(currentToken.value))
+                } else {
+                    elements.add(FElement.Literal(currentToken.value))
+                }
             }
             is FToken.Keyword -> {
-                elements.add(FElement.Keyword(currentToken.value))
+                if (inQuote) {
+                    elements.add(FElement.Quote.Keyword(currentToken.value))
+                } else {
+                    elements.add(FElement.Keyword(currentToken.value))
+                }
+            }
+            is FToken.Quote -> {
+                val index =
+                    parseFirstElement(
+                            allTokens = allTokens,
+                            currentTokenIndex = currentTokenIndex + 1,
+                            inQuote = true,
+                        )
+                        .getOrElse {
+                            return Result.failure(it)
+                        }
+                return Result.success(index)
             }
         }
 
