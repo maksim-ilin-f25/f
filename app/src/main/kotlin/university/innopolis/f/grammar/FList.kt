@@ -45,10 +45,13 @@ value class FList(private val _elements: MutableList<FElement>) {
         ): Result<Pair<Int, Boolean>> {
             val currentToken = allTokens.getOrNull(currentElemIndex)
 
-            if (currentToken == null && !isFirstRun) {
+            if (currentToken == null) {
+                if (isFirstRun) {
+                    return Result.success(Pair(currentElemIndex, true))
+                }
                 return Result.failure(ParseException.UnmatchedOpeningParen(openParCoordinate))
             }
-            when (currentToken!!) {
+            when (currentToken) {
                 is FToken.OpeningParenthesis -> { // recursion
                     val (listAst, nextIndex) =
                         parse(
