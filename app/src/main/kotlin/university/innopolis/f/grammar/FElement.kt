@@ -14,7 +14,7 @@ sealed class FElement {
     }
 
     data class Quote(val value: FElement) : FElement() {
-        override fun toString() = value.toString()
+        override fun toString() = "Quote(${value})"
     }
 
     data class Keyword(val value: FKeyword) : FElement() {
