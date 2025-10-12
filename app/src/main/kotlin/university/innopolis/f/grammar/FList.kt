@@ -45,7 +45,7 @@ value class FList(private val _elements: MutableList<FElement>) {
         ): Result<Pair<Int, Boolean>> {
             val currentToken = allTokens.getOrNull(currentElemIndex)
             if (isFirstRun) {
-                return Result.success(Pair(currentElemIndex, true))
+                return Result.success(Pair(currentElemIndex, false))
             }
             else {
                 if (currentToken == null) {
