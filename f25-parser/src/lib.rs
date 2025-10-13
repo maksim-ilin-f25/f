@@ -18,6 +18,10 @@ mod program;
 mod token_end;
 
 pub fn parse_code_from(file_name: Option<&str>, source_code: String) -> miette::Result<FProgram> {
+    if source_code.chars().all(char::is_whitespace) {
+        return Ok(FProgram(Vec::new()));
+    }
+
     let parse_result = FProgram::chumsky_parser().parse(&source_code).into_result();
     match parse_result {
         Ok(ast) => Ok(ast),

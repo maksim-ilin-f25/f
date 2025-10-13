@@ -4,7 +4,7 @@ use serde::Serialize;
 use crate::{FAtom, FElement, FKeyword, FList, FLiteral};
 
 #[derive(Debug, Clone, Serialize)]
-pub struct FProgram(Vec<FElement>);
+pub struct FProgram(pub(crate) Vec<FElement>);
 
 impl FProgram {
     #[must_use]
