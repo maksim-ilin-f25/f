@@ -1,0 +1,37 @@
+[workspace]
+resolver = "3"
+members = ["f25-*/"]
+default-members = ["f25-cli/"]
+
+[workspace.package]
+version = "0.0.0"
+description = "A reduced version of the Lisp language with some simplifications and modifications"
+repository = "https://github.com/maksim-ilin-f25/f"
+publish = false
+
+[workspace.dependencies]
+bigdecimal = "0.4.8"
+chumsky = "0.11.1"
+clap = { version = "4.5.48", features = ["wrap_help"] }
+clap-cargo = "0.18.0"
+clap_complete_command = { version = "0.6.1", features = [
+  "carapace",
+  "fig",
+  "nushell",
+] }
+clio = "0.3.5"
+colored_json = "5.0.0"
+compact_str = "0.9.0"
+f25-parser = { path = "f25-parser/" }
+miette = "7.6.0"
+num-bigint = "0.4.6"
+serde = "1.0.228"
+serde_json = { version = "1.0.145", features = ["arbitrary_precision"] }
+thiserror = "2.0.17"
+
+[workspace.lints.clippy]
+all = "warn"
+missing-errors-doc = { level = "allow", priority = 1 }
+missing-panics-doc = { level = "allow", priority = 1 }
+nursery = "warn"
+pedantic = "warn"
