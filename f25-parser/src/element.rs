@@ -8,6 +8,7 @@ pub enum FElement {
     Literal(FLiteral),
     Keyword(FKeyword),
     Atom(FAtom),
-    List(FList),
     Quote(Box<FElement>),
+    #[serde(untagged)]
+    List(FList),
 }

@@ -6,7 +6,7 @@ use num_bigint::BigInt;
 use serde::{Serialize, Serializer};
 
 #[derive(Debug, Clone, Serialize)]
-#[serde(rename_all = "lowercase")]
+#[serde(untagged, rename_all = "lowercase")]
 pub enum FLiteral {
     #[serde(serialize_with = "self::serialize_bigint")]
     Integer(BigInt),
