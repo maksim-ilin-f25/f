@@ -13,7 +13,7 @@ clap_complete_command = { workspace = true }
 clio = { workspace = true, features = ["clap-parse"] }
 colored_json = { workspace = true }
 f25-parser = { workspace = true }
-miette = { workspace = true, features = ["fancy"] }
+miette = { workspace = true }
 
 [lints]
 workspace = true

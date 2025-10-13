@@ -17,7 +17,7 @@ mod literal;
 mod program;
 mod token_end;
 
-pub fn parse_code_from(file_name: Option<&str>, source_code: String) -> miette::Result<FProgram> {
+pub fn parse_code_from(file_name: &str, source_code: String) -> miette::Result<FProgram> {
     if source_code.chars().all(char::is_whitespace) {
         return Ok(FProgram(Vec::new()));
     }
@@ -36,42 +36,23 @@ pub fn parse_code_from(file_name: Option<&str>, source_code: String) -> miette::
             };
             let errors = (error.span().start, len).into();
 
-            let error = match file_name {
-                Some(file_name) => self::ChumskyParseFileError {
-                    reason: error.to_string(),
-                    src: NamedSource::new(file_name, source_code),
-                    errors,
-                }
-                .into(),
-                None => self::ChumskyParseStdinError {
-                    reason: error.to_string(),
-                    src: source_code,
-                    errors,
-                }
-                .into(),
+            let error = self::ChumskyParseError {
+                reason: error.to_string(),
+                src: NamedSource::new(file_name, source_code).with_language("Lisp"),
+                errors,
             };
 
-            Err(error)
+            Err(error.into())
         }
     }
 }
 
 #[derive(Error, Debug, Diagnostic)]
 #[error("invalid syntax")]
-struct ChumskyParseFileError {
+struct ChumskyParseError {
     reason: String,
     #[source_code]
     src: NamedSource<String>,
-    #[label("{reason}")]
-    errors: SourceSpan,
-}
-
-#[derive(Error, Debug, Diagnostic)]
-#[error("invalid syntax")]
-struct ChumskyParseStdinError {
-    reason: String,
-    #[source_code]
-    src: String,
     #[label("{reason}")]
     errors: SourceSpan,
 }

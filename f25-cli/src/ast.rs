@@ -8,14 +8,12 @@ pub fn parse(mut input: clio::Input) -> miette::Result<FProgram> {
     input.read_to_string(&mut source_code).into_diagnostic()?;
 
     let file_name = if input.is_std() {
-        None
+        "stdin"
     } else {
-        Some(
-            input
-                .path()
-                .to_str()
-                .ok_or_else(|| miette!("file path is invalid utf-8"))?,
-        )
+        input
+            .path()
+            .to_str()
+            .ok_or_else(|| miette!("file path is invalid utf-8"))?
     };
 
     f25_parser::parse_code_from(file_name, source_code)
