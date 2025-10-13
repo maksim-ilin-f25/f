@@ -8,18 +8,23 @@ use clap::{Args, Parser, Subcommand, crate_description};
     version,
 )]
 pub struct Cli {
-    /// Path to the file to run, use '-' for stdin
-    #[clap(value_parser)]
-    pub input: clio::Input,
-
     #[command(subcommand)]
-    pub command: Option<Command>,
+    pub command: Command,
 }
 
 #[derive(Debug, Subcommand)]
 pub enum Command {
+    /// Execute an F source code file
+    Run(RunArgs),
     /// Generate shell completion scripts for this CLI
     Completions(CompletionsArgs),
+}
+
+#[derive(Debug, Args)]
+pub struct RunArgs {
+    /// Path to the file to run, use '-' for stdin
+    #[clap(value_parser)]
+    pub input: clio::Input,
 }
 
 #[derive(Debug, Args)]
