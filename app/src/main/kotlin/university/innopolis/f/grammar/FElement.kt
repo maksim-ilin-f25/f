@@ -1,5 +1,8 @@
 package university.innopolis.f.grammar
 
+import university.innopolis.f.parser.parseToAst
+import kotlin.system.exitProcess
+
 sealed class FElement {
     data class Atom(val value: FAtom) : FElement() {
         override fun toString() = value.toString()
