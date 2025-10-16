@@ -17,6 +17,6 @@ sealed class FLiteral {
                 is Boolean -> this.inner.toString()
                 is Null -> "null"
             }
-        return "Literal($inner)"
+        return "{ literal: $inner }"
     }
 }

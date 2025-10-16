@@ -1,5 +1,8 @@
 package university.innopolis.f.grammar
 
+import university.innopolis.f.parser.parseToAst
+import kotlin.system.exitProcess
+
 sealed class FElement {
     data class Atom(val value: FAtom) : FElement() {
         override fun toString() = value.toString()
@@ -14,7 +17,7 @@ sealed class FElement {
     }
 
     data class Quote(val value: FElement) : FElement() {
-        override fun toString() = "Quote(${value})"
+        override fun toString() = "{ quote: $value }"
     }
 
     data class Keyword(val value: FKeyword) : FElement() {

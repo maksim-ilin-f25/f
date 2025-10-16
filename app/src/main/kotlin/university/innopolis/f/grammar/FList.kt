@@ -6,7 +6,7 @@ import university.innopolis.f.parser.ParseException
 
 @JvmInline
 value class FList(val elements: MutableList<FElement>) {
-    override fun toString() = "List${this.elements}"
+    override fun toString() = "${this.elements}"
 
     companion object {
         /** On success, returns the index after the matching closing parenthesis. */

@@ -4,7 +4,7 @@ import java.math.BigInteger
 
 @JvmInline
 value class FInteger(private val inner: BigInteger) {
-    override fun toString() = "Integer(${this.inner})"
+    override fun toString() = this.inner.toString()
 
     companion object {
         fun List<FDecimalDigit>.toPositiveFInteger(): FInteger {

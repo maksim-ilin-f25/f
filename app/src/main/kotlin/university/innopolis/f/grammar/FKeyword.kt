@@ -11,7 +11,7 @@ enum class FKeyword(val string: String) {
     RETURN("return"),
     BREAK("break");
 
-    override fun toString() = "Keyword.${this.string}"
+    override fun toString() = """{ keyword: "${this.string}" }"""
 
     companion object {
         fun fromAtom(atom: FAtom): FKeyword? {
