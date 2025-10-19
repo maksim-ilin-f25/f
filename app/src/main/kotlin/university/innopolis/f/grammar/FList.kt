@@ -3,10 +3,29 @@ package university.innopolis.f.grammar
 import university.innopolis.f.lexer.Coordinate
 import university.innopolis.f.lexer.FToken
 import university.innopolis.f.parser.ParseException
+import university.innopolis.f.runtime.FunCall
 
 @JvmInline
 value class FList(val elements: MutableList<FElement>) {
     override fun toString() = "${this.elements}"
+
+    fun funNameOrNull(): FElement? = this.elements.firstOrNull()
+
+    fun argsOrNull(): List<FElement>? {
+        if (this.elements.isEmpty()) {
+            return null
+        }
+        return this.elements.subList(1, this.elements.size)
+    }
+
+    fun toFunCallOrNull(): FunCall? {
+        val name = funNameOrNull()
+        if (name == null) {
+            return null
+        }
+        val args = argsOrNull()!! // checked right above
+        return FunCall(name, args)
+    }
 
     companion object {
         /** On success, returns the index after the matching closing parenthesis. */

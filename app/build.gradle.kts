@@ -45,7 +45,7 @@ tasks.named<Test>("test") {
     useJUnitPlatform()
 }
 
-tasks.run { standardInput = System.`in` }
+//tasks.run { standardInput = System.`in` }
 
 val compileKotlin: KotlinCompile by tasks
 
