@@ -4,63 +4,163 @@ import university.innopolis.f.runtime.RuntimeException
 
 sealed class FSpecialForm {
     class Quote(val value: FElement) : FSpecialForm() {
-        fun from(args: List<FElement>): Result<Quote> {
-            if (args.size != 1) {
-                return Result.failure(RuntimeException.InvalidNumOfArgs())
+
+        companion object {
+            fun from(args: List<FElement>): Result<Quote> {
+                if (args.size != 1) {
+                    return Result.failure(RuntimeException.InvalidNumOfArgs())
+                }
+                return Result.success(Quote(value = args.first()))
             }
-            return Result.success(Quote(args.first()))
         }
     }
 
     class Setq(val name: FAtom, val value: FElement) : FSpecialForm() {
-        fun from(args: List<FElement>): Result<Setq> {
-            if (args.size != 2) {
-                return Result.failure(RuntimeException.InvalidNumOfArgs())
-            }
-            val firstArg = args.first()
-            return when (firstArg) {
-                is FElement.Atom -> Result.success(Setq(firstArg.value, args[1]))
-                else -> Result.failure(RuntimeException.TypeMismatch())
+
+        companion object {
+            fun from(args: List<FElement>): Result<Setq> {
+                if (args.size != 2) {
+                    return Result.failure(RuntimeException.InvalidNumOfArgs())
+                }
+                val firstArg = args.first()
+                return when (firstArg) {
+                    is FElement.Atom -> Result.success(Setq(name = firstArg.value, value = args[1]))
+                    else -> Result.failure(RuntimeException.InvalidArgForm())
+                }
             }
         }
     }
 
     class Func(val name: FAtom, val params: List<FAtom>, val body: FElement) : FSpecialForm() {
-        fun from(args: List<FElement>): Result<Func> {
-            if (args.size != 3) {
-                return Result.failure(RuntimeException.InvalidNumOfArgs())
+
+        companion object {
+            fun from(args: List<FElement>): Result<Func> {
+                if (args.size != 3) {
+                    return Result.failure(RuntimeException.InvalidNumOfArgs())
+                }
+                val argName = args[0]
+                val argParamsRaw = args[1]
+                val argBody = args[2]
+                if (argName !is FElement.Atom) {
+                    return Result.failure(RuntimeException.InvalidArgForm())
+                }
+                if (argParamsRaw !is FElement.List) {
+                    return Result.failure(RuntimeException.InvalidArgForm())
+                }
+                val argParams =
+                    runCatching { argParamsRaw.value.elements.map { (it as FElement.Atom).value } }
+                        .getOrNull()
+                if (argParams == null) {
+                    return Result.failure(RuntimeException.InvalidArgForm())
+                }
+                return Result.success(
+                    Func(name = argName.value, params = argParams, body = argBody)
+                )
             }
-            val funName = args[0]
-            val rawFunParams = args[1]
-            val funBody = args[2]
-            if (funName !is FElement.Atom) {
-                return Result.failure(RuntimeException.TypeMismatch())
-            }
-            if (rawFunParams !is FElement.List) {
-                return Result.failure(RuntimeException.TypeMismatch())
-            }
-            val funParams =
-                runCatching { rawFunParams.value.elements.map { (it as FElement.Atom).value } }
-                    .getOrNull()
-            if (funParams == null) {
-                return Result.failure(RuntimeException.TypeMismatch())
-            }
-            return Result.success(Func(name = funName.value, params = funParams, body = funBody))
         }
     }
 
-    class Lambda(val parameters: List<FAtom>, val body: FElement) : FSpecialForm()
+    class Lambda(val params: List<FAtom>, val body: FElement) : FSpecialForm() {
 
-    class Prog(val localContext: List<Pair<FAtom, FElement>>, val body: FElement) : FSpecialForm()
+        companion object {
+            fun from(args: List<FElement>): Result<Lambda> {
+                if (args.size != 2) {
+                    return Result.failure(RuntimeException.InvalidNumOfArgs())
+                }
+                val argParamsRaw = args[0]
+                val argBody = args[1]
+                if (argParamsRaw !is FElement.List) {
+                    return Result.failure(RuntimeException.InvalidArgForm())
+                }
+                val argParams =
+                    runCatching { argParamsRaw.value.elements.map { (it as FElement.Atom).value } }
+                        .getOrNull()
+                if (argParams == null) {
+                    return Result.failure(RuntimeException.InvalidArgForm())
+                }
+                return Result.success(Lambda(params = argParams, body = argBody))
+            }
+        }
+    }
 
-    class Cond(val condition: FElement, val thenBody: FElement, val elseBody: FElement?) :
-        FSpecialForm()
+    class Prog(val localContext: List<Pair<FAtom, FElement>>, val body: List<FElement>) :
+        FSpecialForm() {
 
-    class While(val condition: FElement, val body: FElement) : FSpecialForm()
+        companion object {
+            fun from(args: List<FElement>): Result<Prog> {
+                if (args.size < 2) {
+                    return Result.failure(RuntimeException.InvalidNumOfArgs())
+                }
+                val argLocalContext =
+                    runCatching {
+                            (args[0] as FElement.List).value.elements.map {
+                                val x = (it as FElement.List).value.elements
+                                assert(x.size == 2)
+                                Pair((x[0] as FElement.Atom).value, x[1])
+                            }
+                        }
+                        .getOrNull()
+                if (argLocalContext == null) {
+                    return Result.failure(RuntimeException.InvalidArgForm())
+                }
+                val argBody = args.subList(1, args.size)
+                return Result.success(Prog(localContext = argLocalContext, body = argBody))
+            }
+        }
+    }
 
-    class Return(val value: FElement) : FSpecialForm()
+    class Cond(val condition: FElement, val thenBody: FElement, val elseBody: FElement) :
+        FSpecialForm() {
 
-    object Break : FSpecialForm()
+        companion object {
+            fun from(args: List<FElement>): Result<Cond> {
+                if (args.size !in 2..3) {
+                    return Result.failure(RuntimeException.InvalidNumOfArgs())
+                }
+                val argCond = args[0]
+                val argThen = args[1]
+                val argElse = args.getOrNull(2) ?: FElement.Literal(FLiteral.Null)
+                return Result.success(
+                    Cond(condition = argCond, thenBody = argThen, elseBody = argElse)
+                )
+            }
+        }
+    }
+
+    class While(val condition: FElement, val body: FElement) : FSpecialForm() {
+
+        companion object {
+            fun from(args: List<FElement>): Result<While> {
+                if (args.size != 2) {
+                    return Result.failure(RuntimeException.InvalidNumOfArgs())
+                }
+                val argCond = args[0]
+                val argBody = args[1]
+                return Result.success(While(condition = argCond, body = argBody))
+            }
+        }
+    }
+
+    class Return(val value: FElement) : FSpecialForm() {
+
+        companion object {
+            fun from(args: List<FElement>): Result<Return> {
+                if (args.size != 1) {
+                    return Result.failure(RuntimeException.InvalidNumOfArgs())
+                }
+                return Result.success(Return(args.first()))
+            }
+        }
+    }
+
+    object Break : FSpecialForm() {
+        fun from(args: List<FElement>): Result<Break> {
+            if (args.isNotEmpty()) {
+                return Result.failure(RuntimeException.InvalidNumOfArgs())
+            }
+            return Result.success(Break)
+        }
+    }
 
     //    private fun checkFunName(name: FElement, keyword: FKeyword): Result<Unit> {
     //        if (name != FElement.Keyword(keyword)) {

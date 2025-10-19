@@ -4,7 +4,7 @@ sealed class RuntimeException() : IllegalArgumentException() {
     class InvalidNumOfArgs() : RuntimeException() {
         override fun toString(): String = TODO()
     }
-    class TypeMismatch() : RuntimeException() {
+    class InvalidArgForm() : RuntimeException() {
         override fun toString(): String = TODO()
     }
 }
