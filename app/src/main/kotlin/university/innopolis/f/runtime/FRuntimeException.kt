@@ -12,4 +12,8 @@ sealed class FRuntimeException() : IllegalArgumentException() {
     class StandaloneKeyword() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
+
+    class EmptyFunCall() : FRuntimeException() {
+        override fun toString(): String = TODO()
+    }
 }
