@@ -1,22 +1,25 @@
 package university.innopolis.f.grammar
 
-sealed class FLiteral {
-    class Integer(val inner: FInteger) : FLiteral()
+import university.innopolis.f.runtime.Display
 
-    class Real(val inner: FReal) : FLiteral()
+sealed class FLiteral : Display {
+    class Integer(val inner: FInteger) : FLiteral() {
+        override fun display() = inner.toString()
+    }
 
-    class Boolean(val inner: FBoolean) : FLiteral()
+    class Real(val inner: FReal) : FLiteral() {
+        override fun display() = inner.toString()
+    }
 
-    object Null : FLiteral()
+    class Boolean(val inner: FBoolean) : FLiteral() {
+        override fun display() = inner.toString()
+    }
+
+    object Null : FLiteral() {
+        override fun display() = "null"
+    }
 
     override fun toString(): String {
-        val inner =
-            when (this) {
-                is Integer -> this.inner.toString()
-                is Real -> this.inner.toString()
-                is Boolean -> this.inner.toString()
-                is Null -> "null"
-            }
-        return "{ literal: $inner }"
+        return "{ literal: ${this.display()} }"
     }
 }
