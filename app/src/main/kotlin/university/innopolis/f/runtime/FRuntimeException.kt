@@ -13,11 +13,15 @@ sealed class FRuntimeException() : IllegalArgumentException() {
         override fun toString(): String = TODO()
     }
 
-    class EmptyFunCall() : FRuntimeException() {
+    class MalformedFunCall() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
 
     class UnboundAtom() : FRuntimeException() {
+        override fun toString(): String = TODO()
+    }
+
+    class NoncallableCall() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
 }

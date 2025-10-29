@@ -33,10 +33,18 @@ class Runtime(val ast: List<FElement>) {
             is FElement.List -> {
                 val funCall = element.value.toFunCallOrNull()
                 if (funCall == null) {
-                    yield(Result.failure(FRuntimeException.EmptyFunCall()))
+                    yield(Result.failure(FRuntimeException.MalformedFunCall()))
                     return@sequence
                 }
-                TODO()
+                val function = context.valueOf(funCall.name)
+                if (function == null) {
+                    yield(Result.failure(FRuntimeException.UnboundAtom()))
+                    return@sequence
+                }
+                if (function !is FValue.Function) {
+                    yield(Result.failure(FRuntimeException.NoncallableCall()))
+                    return@sequence
+                }
             }
             is FElement.Literal -> yield(Result.success(element.value.display()))
             is FElement.Quote -> yield(Result.success(element.value.display()))

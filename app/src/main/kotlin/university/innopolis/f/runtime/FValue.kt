@@ -31,10 +31,4 @@ sealed class FValue() : Display {
             TODO()
         }
     }
-
-    data class BuiltinFunction(val value: Nothing) : FValue() {
-        override fun display(): String {
-            TODO()
-        }
-    }
 }

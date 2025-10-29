@@ -9,7 +9,13 @@ import university.innopolis.f.runtime.FunCall
 value class FList(val elements: MutableList<FElement>) {
     override fun toString() = "${this.elements}"
 
-    fun funNameOrNull(): FElement? = this.elements.firstOrNull()
+    fun funNameOrNull(): FAtom? {
+        val name = this.elements.firstOrNull()
+        if (name !is FElement.Atom) {
+            return null
+        }
+        return name.value
+    }
 
     fun argsOrNull(): List<FElement>? {
         if (this.elements.isEmpty()) {
