@@ -7,9 +7,11 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
 }
 
 class Runtime(val ast: List<FElement>) {
+    val rootContext = FContext(parent = null)
+
     fun run(): Sequence<Result<String>> = sequence {
         outer@ for (element in ast) {
-            for (result in runElement(element)) {
+            for (result in runElement(element, rootContext)) {
                 yield(result)
                 if (result.isFailure) {
                     break@outer
@@ -18,10 +20,15 @@ class Runtime(val ast: List<FElement>) {
         }
     }
 
-    fun runElement(element: FElement): Sequence<Result<String>> = sequence {
+    fun runElement(element: FElement, context: FContext): Sequence<Result<String>> = sequence {
         when (element) {
             is FElement.Atom -> {
-                TODO()
+                val value = context.valueOf(element.value)
+                if (value == null) {
+                    yield(Result.failure(FRuntimeException.UnboundAtom()))
+                    return@sequence
+                }
+                yield(Result.success(value.display()))
             }
             is FElement.List -> {
                 val funCall = element.value.toFunCallOrNull()

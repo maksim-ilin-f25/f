@@ -16,4 +16,8 @@ sealed class FRuntimeException() : IllegalArgumentException() {
     class EmptyFunCall() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
+
+    class UnboundAtom() : FRuntimeException() {
+        override fun toString(): String = TODO()
+    }
 }
