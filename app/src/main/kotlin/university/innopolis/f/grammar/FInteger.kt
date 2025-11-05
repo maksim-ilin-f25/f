@@ -3,6 +3,6 @@ package university.innopolis.f.grammar
 import java.math.BigInteger
 
 @JvmInline
-value class FInteger(private val inner: BigInteger) {
+value class FInteger(val inner: BigInteger) {
     override fun toString() = this.inner.toString()
 }

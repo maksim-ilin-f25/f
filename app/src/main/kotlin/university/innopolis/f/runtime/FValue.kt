@@ -28,7 +28,7 @@ sealed class FValue() : Display {
             TODO()
         }
 
-        fun call(args: List<FValue>): Result<FValue> {
+        fun call(args: List<FValue>, parentContext: FContext): Sequence<Result<FValue>> {
             TODO()
         }
     }

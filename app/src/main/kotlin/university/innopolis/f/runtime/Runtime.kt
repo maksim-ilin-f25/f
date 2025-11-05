@@ -46,18 +46,26 @@ class Runtime(val ast: List<FElement>) {
                     return@sequence
                 }
                 val args = mutableListOf<FValue>()
-                for (x in funCall.args.map { runElement(it, context) }) {
+                for (outputSequence in funCall.args.map { runElement(it, context) }) {
                     var arg: FValue? = null
-                    for (y in x) {
-                        yield(y)
-                        if (y.isFailure) {
+                    for (result in outputSequence) {
+                        yield(result)
+                        if (result.isFailure) {
                             return@sequence
                         }
-                        arg = y.getOrThrow()
+                        arg = result.getOrThrow()
                     }
                     args.add(arg!!)
                 }
-                function.call(args)
+                var executionResult: FValue? = null
+                for (result in function.call(args, context)) {
+                    yield(result)
+                    if (result.isFailure) {
+                        return@sequence
+                    }
+                    executionResult = result.getOrThrow()
+                }
+                yield(Result.success(executionResult!!))
             }
             is FElement.Literal -> yield(Result.success(FValue.fromLiteral(element.value)))
             is FElement.Quote -> yield(Result.success(FValue.Quote(element.value)))
