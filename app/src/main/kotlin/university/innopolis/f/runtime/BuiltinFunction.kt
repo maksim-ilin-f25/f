@@ -89,16 +89,16 @@ fun divide(args: List<FValue>): Sequence<Result<FValue>> = sequence {
         yield(
             when {
                 lhs is FValue.Integer && rhs is FValue.Integer ->
-                    Result.success(FValue.Integer(FInteger(lhs.value.inner / rhs.value.inner)))
+                    Result.success(FValue.Integer(FInteger(lhs.value.inner.divide(rhs.value.inner))))
 
                 lhs is FValue.Integer && rhs is FValue.Real ->
-                    Result.success(FValue.Real(FReal(lhs.value.inner.toBigDecimal() / rhs.value.inner)))
+                    Result.success(FValue.Real(FReal(lhs.value.inner.toBigDecimal().divide(rhs.value.inner))))
 
                 lhs is FValue.Real && rhs is FValue.Integer ->
-                    Result.success(FValue.Real(FReal(lhs.value.inner / rhs.value.inner.toBigDecimal())))
+                    Result.success(FValue.Real(FReal(lhs.value.inner.divide(rhs.value.inner.toBigDecimal()))))
 
                 lhs is FValue.Real && rhs is FValue.Real ->
-                    Result.success(FValue.Real(FReal(lhs.value.inner / rhs.value.inner)))
+                    Result.success(FValue.Real(FReal(lhs.value.inner.divide(rhs.value.inner))))
 
                 else -> Result.failure(FRuntimeException.TypeError())
             }
