@@ -15,6 +15,7 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
     val context = FContext(parent = rootContext)
     return sequence {
         outer@ for (element in ast) {
+            TODO("runElement no longer exists")
             for (result in runElement(element, context)) {
                 yield(result.map { it.display() })
                 if (result.isFailure) {
@@ -29,8 +30,9 @@ fun evaluateListTo(list: MutableList<FValue>, ast: List<FElement>, context: FCon
     sequence {
         for (outputSequence in ast) {
             var element: FValue? = null
+            TODO("runElement no longer exists")
             for (result in runElement(outputSequence, context)) {
-//                yield(result)
+                yield(result)
                 if (result.isFailure) {
                     return@sequence
                 }
@@ -89,6 +91,8 @@ fun evaluateElementTo(
                         return@sequence
                     }
                 }
+
+                TODO("write the list to `target`")
             }
 
             is FElement.Literal -> {
