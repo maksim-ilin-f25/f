@@ -12,7 +12,7 @@ sealed class FValue() : Display {
     }
 
     data class Quote(val value: FElement) : FValue() {
-        override fun display() = value.display()
+        override fun display() = "'${value.display()}"
     }
 
     data class Boolean(val value: FBoolean) : FValue() {
