@@ -4,9 +4,9 @@ import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
 
 sealed class FFunction {
-    class Builtin(val fn: (List<FValue>) -> Sequence<Result<FValue>>) : FFunction() {
+    class Builtin(val fn: (List<FValue>, FContext) -> Sequence<Result<FValue>>) : FFunction() {
         override fun call(args: List<FValue>, parentContext: FContext): Sequence<Result<FValue>> = sequence {
-            for (result in fn(args)) {
+            for (result in fn(args, parentContext)) {
                 yield(result)
                 if (result.isFailure) {
                     return@sequence

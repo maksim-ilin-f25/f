@@ -6,16 +6,14 @@ import university.innopolis.f.grammar.FElement
 fun runF(ast: List<FElement>): Sequence<Result<String>> {
     val rootContext = FContext(parent = null)
 
-    rootContext.set(FAtom("plus"), FValue.Function(FFunction.Builtin { plus(it) }))
-    rootContext.set(FAtom("minus"), FValue.Function(FFunction.Builtin { minus(it) }))
-    rootContext.set(FAtom("times"), FValue.Function(FFunction.Builtin { times(it) }))
-    rootContext.set(FAtom("divide"), FValue.Function(FFunction.Builtin { divide(it) }))
+    rootContext.set(FAtom("plus"), FValue.Function(FFunction.Builtin { args, context -> plus(args, context) }))
+    rootContext.set(FAtom("minus"), FValue.Function(FFunction.Builtin { args, context -> minus(args, context) }))
+    rootContext.set(FAtom("times"), FValue.Function(FFunction.Builtin { args, context -> times(args, context) }))
+    rootContext.set(FAtom("divide"), FValue.Function(FFunction.Builtin { args, context -> divide(args, context) }))
+    rootContext.set(FAtom("head"), FValue.Function(FFunction.Builtin { args, context -> head(args, context) }))
 
-    return Runtime(ast, FContext(parent = rootContext)).run()
-}
-
-class Runtime(val ast: List<FElement>, val context: FContext) {
-    fun run(): Sequence<Result<String>> = sequence {
+    val context = FContext(parent = rootContext)
+    return sequence {
         outer@ for (element in ast) {
             for (result in runElement(element, context)) {
                 yield(result.map { it.display() })
@@ -25,8 +23,32 @@ class Runtime(val ast: List<FElement>, val context: FContext) {
             }
         }
     }
+}
 
-    fun runElement(element: FElement, context: FContext): Sequence<Result<FValue>> = sequence {
+fun evaluateListTo(list: MutableList<FValue>, ast: List<FElement>, context: FContext): Sequence<Result<FValue>> =
+    sequence {
+        for (outputSequence in ast) {
+            var element: FValue? = null
+            for (result in runElement(outputSequence, context)) {
+//                yield(result)
+                if (result.isFailure) {
+                    return@sequence
+                }
+                element = result.getOrThrow()
+            }
+            list.add(element!!)
+        }
+
+    }
+
+class Wrapper<T>(var value: T)
+
+fun evaluateElementTo(
+    target: Wrapper<FValue>,
+    element: FElement,
+    context: FContext
+): Sequence<Result<FValue>> =
+    sequence {
         when (element) {
             is FElement.Atom -> {
                 val value = context.valueOf(element.value)
@@ -34,7 +56,7 @@ class Runtime(val ast: List<FElement>, val context: FContext) {
                     yield(Result.failure(FRuntimeException.UnboundAtom()))
                     return@sequence
                 }
-                yield(Result.success(value))
+                target.value = value
             }
 
             is FElement.List -> {
@@ -52,16 +74,13 @@ class Runtime(val ast: List<FElement>, val context: FContext) {
                     yield(Result.failure(FRuntimeException.NotAFunction()))
                     return@sequence
                 }
+
                 val args = mutableListOf<FValue>()
-                for (outputSequence in funCall.args.map { runElement(it, context) }) {
-                    var arg: FValue? = null
-                    for (result in outputSequence) {
-                        if (result.isFailure) {
-                            return@sequence
-                        }
-                        arg = result.getOrThrow()
+                for (result in evaluateListTo(args, funCall.args, context)) {
+                    yield(result)
+                    if (result.isFailure) {
+                        return@sequence
                     }
-                    args.add(arg!!)
                 }
 
                 for (result in function.value.call(args, context)) {
@@ -72,9 +91,14 @@ class Runtime(val ast: List<FElement>, val context: FContext) {
                 }
             }
 
-            is FElement.Literal -> yield(Result.success(FValue.fromLiteral(element.value)))
-            is FElement.Quote -> yield(Result.success(FValue.Quote(element.value)))
+            is FElement.Literal -> {
+                target.value = FValue.fromLiteral(element.value)
+            }
+
+            is FElement.Quote -> {
+                target.value = FValue.Quote(element.value)
+            }
+
             is FElement.Keyword -> yield(Result.failure(FRuntimeException.StandaloneKeyword()))
         }
     }
-}

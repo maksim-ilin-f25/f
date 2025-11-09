@@ -25,10 +25,7 @@ value class FList(val elements: MutableList<FElement>) {
     }
 
     fun toFunCallOrNull(): FunCall? {
-        val name = funNameOrNull()
-        if (name == null) {
-            return null
-        }
+        val name = funNameOrNull() ?: return null
         val args = argsOrNull()!! // checked right above
         return FunCall(name, args)
     }
@@ -46,12 +43,12 @@ value class FList(val elements: MutableList<FElement>) {
             while (res.second) {
                 res =
                     parseElement(
-                            allTokens = allTokens,
-                            currentElemIndex = res.first,
-                            buffer = self.elements,
-                            openParCoordinate = allTokens.getOrNull(firstElemIndex - 1)?.coordinate,
-                            isFirstRun = isFirstRun,
-                        )
+                        allTokens = allTokens,
+                        currentElemIndex = res.first,
+                        buffer = self.elements,
+                        openParCoordinate = allTokens.getOrNull(firstElemIndex - 1)?.coordinate,
+                        isFirstRun = isFirstRun,
+                    )
                         .getOrElse {
                             return Result.failure(it)
                         }
@@ -79,16 +76,17 @@ value class FList(val elements: MutableList<FElement>) {
                 is FToken.OpeningParenthesis -> { // recursion
                     val (listAst, nextIndex) =
                         parse(
-                                allTokens = allTokens,
-                                firstElemIndex = currentElemIndex + 1,
-                                isFirstRun = false,
-                            )
+                            allTokens = allTokens,
+                            firstElemIndex = currentElemIndex + 1,
+                            isFirstRun = false,
+                        )
                             .getOrElse {
                                 return Result.failure(it)
                             }
                     buffer.add(FElement.List(listAst))
                     return Result.success(Pair(nextIndex, true))
                 }
+
                 is FToken.ClosingParenthesis -> {
                     if (isFirstRun) {
                         return Result.failure(
@@ -97,24 +95,28 @@ value class FList(val elements: MutableList<FElement>) {
                     }
                     return Result.success(Pair(currentElemIndex + 1, false))
                 }
+
                 is FToken.Atom -> {
                     buffer.add(FElement.Atom(currentToken.value))
                 }
+
                 is FToken.Literal -> {
                     buffer.add(FElement.Literal(currentToken.value))
                 }
+
                 is FToken.Keyword -> {
                     buffer.add(FElement.Keyword(currentToken.value))
                 }
+
                 is FToken.Quote -> {
                     val res =
                         parseElement(
-                                allTokens = allTokens,
-                                currentElemIndex = currentElemIndex + 1,
-                                buffer = buffer,
-                                openParCoordinate = openParCoordinate,
-                                isFirstRun = false,
-                            )
+                            allTokens = allTokens,
+                            currentElemIndex = currentElemIndex + 1,
+                            buffer = buffer,
+                            openParCoordinate = openParCoordinate,
+                            isFirstRun = false,
+                        )
                             .getOrElse {
                                 return Result.failure(it)
                             }

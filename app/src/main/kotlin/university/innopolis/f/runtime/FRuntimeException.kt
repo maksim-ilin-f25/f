@@ -32,4 +32,8 @@ sealed class FRuntimeException() : IllegalArgumentException() {
     class DivisionByZero() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
+
+    class NotEnoughElements() : FRuntimeException() {
+        override fun toString(): String = TODO()
+    }
 }
