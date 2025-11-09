@@ -3,20 +3,31 @@ package university.innopolis.f.runtime
 import university.innopolis.f.grammar.FInteger
 import university.innopolis.f.grammar.FReal
 
-fun plus(arg1: FValue, arg2: FValue): Result<FValue> {
-    return when {
-        arg1 is FValue.Integer && arg2 is FValue.Integer ->
-            Result.success(FValue.Integer(FInteger(arg1.value.inner + arg2.value.inner)))
-
-        arg1 is FValue.Integer && arg2 is FValue.Real ->
-            Result.success(FValue.Real(FReal(arg1.value.inner.toBigDecimal() + arg2.value.inner)))
-
-        arg1 is FValue.Real && arg2 is FValue.Integer ->
-            Result.success(FValue.Real(FReal(arg1.value.inner + arg2.value.inner.toBigDecimal())))
-
-        arg1 is FValue.Real && arg2 is FValue.Real ->
-            Result.success(FValue.Real(FReal(arg1.value.inner + arg2.value.inner)))
-
-        else -> Result.failure(FRuntimeException.TypeError())
+fun plus(args: List<FValue>): Sequence<Result<FValue>> = sequence {
+    if (args.size != 2) {
+        yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
+        return@sequence
     }
+    val (lhs, rhs) = args
+    yield(
+        when {
+            lhs is FValue.Integer && rhs is FValue.Integer ->
+                Result.success(FValue.Integer(FInteger(lhs.value.inner + rhs.value.inner)))
+
+            lhs is FValue.Integer && rhs is FValue.Real ->
+                Result.success(FValue.Real(FReal(lhs.value.inner.toBigDecimal() + rhs.value.inner)))
+
+            lhs is FValue.Real && rhs is FValue.Integer ->
+                Result.success(FValue.Real(FReal(lhs.value.inner + rhs.value.inner.toBigDecimal())))
+
+            lhs is FValue.Real && rhs is FValue.Real ->
+                Result.success(FValue.Real(FReal(lhs.value.inner + rhs.value.inner)))
+
+            else -> Result.failure(FRuntimeException.TypeError())
+        }
+    )
+}
+
+fun main() {
+    println(plus(listOf(FValue.Integer(FInteger(1.toBigInteger())))))
 }

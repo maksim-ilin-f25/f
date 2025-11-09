@@ -1,17 +1,18 @@
 package university.innopolis.f.runtime
 
+import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
 
 fun runF(ast: List<FElement>): Sequence<Result<String>> {
-    return Runtime(ast).run()
+    val rootContext = FContext(parent = null)
+    rootContext.set(FAtom("plus"), FValue.Function(FFunction.Builtin { plus(it) }))
+    return Runtime(ast, FContext(parent = rootContext)).run()
 }
 
-class Runtime(val ast: List<FElement>) {
-    val rootContext = FContext(parent = null)
-
+class Runtime(val ast: List<FElement>, val context: FContext) {
     fun run(): Sequence<Result<String>> = sequence {
         outer@ for (element in ast) {
-            for (result in runElement(element, rootContext)) {
+            for (result in runElement(element, context)) {
                 yield(result.map { it.display() })
                 if (result.isFailure) {
                     break@outer
@@ -30,6 +31,7 @@ class Runtime(val ast: List<FElement>) {
                 }
                 yield(Result.success(value))
             }
+
             is FElement.List -> {
                 val funCall = element.value.toFunCallOrNull()
                 if (funCall == null) {
@@ -42,7 +44,7 @@ class Runtime(val ast: List<FElement>) {
                     return@sequence
                 }
                 if (function !is FValue.Function) {
-                    yield(Result.failure(FRuntimeException.NoncallableCall()))
+                    yield(Result.failure(FRuntimeException.NotAFunction()))
                     return@sequence
                 }
                 val args = mutableListOf<FValue>()
@@ -58,7 +60,7 @@ class Runtime(val ast: List<FElement>) {
                     args.add(arg!!)
                 }
                 var executionResult: FValue? = null
-                for (result in function.call(args, context)) {
+                for (result in function.value.call(args, context)) {
                     yield(result)
                     if (result.isFailure) {
                         return@sequence
@@ -67,6 +69,7 @@ class Runtime(val ast: List<FElement>) {
                 }
                 yield(Result.success(executionResult!!))
             }
+
             is FElement.Literal -> yield(Result.success(FValue.fromLiteral(element.value)))
             is FElement.Quote -> yield(Result.success(FValue.Quote(element.value)))
             is FElement.Keyword -> yield(Result.failure(FRuntimeException.StandaloneKeyword()))

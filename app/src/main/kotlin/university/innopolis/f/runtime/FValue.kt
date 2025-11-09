@@ -23,12 +23,8 @@ sealed class FValue() : Display {
         override fun display() = "null"
     }
 
-    data class Function(val name: FAtom?, val params: List<FAtom>, val body: FElement) : FValue() {
+    data class Function(val value: FFunction) : FValue() {
         override fun display(): String {
-            TODO()
-        }
-
-        fun call(args: List<FValue>, parentContext: FContext): Sequence<Result<FValue>> {
             TODO()
         }
     }

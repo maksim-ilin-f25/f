@@ -12,4 +12,8 @@ data class FContext(val parent: FContext?) {
         }
         return parent?.valueOf(atom)
     }
+
+    fun set(name: FAtom, value: FValue) {
+        this.locals[name] = value
+    }
 }

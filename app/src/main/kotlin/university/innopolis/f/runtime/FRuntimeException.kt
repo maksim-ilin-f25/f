@@ -21,7 +21,7 @@ sealed class FRuntimeException() : IllegalArgumentException() {
         override fun toString(): String = TODO()
     }
 
-    class NoncallableCall() : FRuntimeException() {
+    class NotAFunction() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
 
