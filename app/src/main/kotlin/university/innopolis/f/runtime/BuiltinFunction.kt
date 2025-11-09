@@ -27,7 +27,3 @@ fun plus(args: List<FValue>): Sequence<Result<FValue>> = sequence {
         }
     )
 }
-
-fun main() {
-    println(plus(listOf(FValue.Integer(FInteger(1.toBigInteger())))))
-}
