@@ -8,6 +8,8 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
 
     rootContext.set(FAtom("plus"), FValue.Function(FFunction.Builtin { plus(it) }))
     rootContext.set(FAtom("minus"), FValue.Function(FFunction.Builtin { minus(it) }))
+    rootContext.set(FAtom("times"), FValue.Function(FFunction.Builtin { times(it) }))
+    rootContext.set(FAtom("divide"), FValue.Function(FFunction.Builtin { divide(it) }))
 
     return Runtime(ast, FContext(parent = rootContext)).run()
 }
