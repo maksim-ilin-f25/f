@@ -51,7 +51,6 @@ class Runtime(val ast: List<FElement>, val context: FContext) {
                 for (outputSequence in funCall.args.map { runElement(it, context) }) {
                     var arg: FValue? = null
                     for (result in outputSequence) {
-                        yield(result)
                         if (result.isFailure) {
                             return@sequence
                         }
@@ -59,15 +58,13 @@ class Runtime(val ast: List<FElement>, val context: FContext) {
                     }
                     args.add(arg!!)
                 }
-                var executionResult: FValue? = null
+
                 for (result in function.value.call(args, context)) {
                     yield(result)
                     if (result.isFailure) {
                         return@sequence
                     }
-                    executionResult = result.getOrThrow()
                 }
-                yield(Result.success(executionResult!!))
             }
 
             is FElement.Literal -> yield(Result.success(FValue.fromLiteral(element.value)))
