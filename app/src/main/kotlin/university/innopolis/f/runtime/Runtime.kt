@@ -5,7 +5,10 @@ import university.innopolis.f.grammar.FElement
 
 fun runF(ast: List<FElement>): Sequence<Result<String>> {
     val rootContext = FContext(parent = null)
+
     rootContext.set(FAtom("plus"), FValue.Function(FFunction.Builtin { plus(it) }))
+    rootContext.set(FAtom("minus"), FValue.Function(FFunction.Builtin { minus(it) }))
+
     return Runtime(ast, FContext(parent = rootContext)).run()
 }
 
