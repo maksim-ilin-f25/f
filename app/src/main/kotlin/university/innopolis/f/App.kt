@@ -1,12 +1,12 @@
 package university.innopolis.f
 
-// import university.innopolis.f.runtime.FRuntimeException
-// import university.innopolis.f.runtime.runF
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.types.inputStream
 import university.innopolis.f.parser.parseToAst
+import university.innopolis.f.runtime.FRuntimeException
+import university.innopolis.f.runtime.runF
 import kotlin.system.exitProcess
 
 class App : CliktCommand() {
@@ -19,13 +19,13 @@ class App : CliktCommand() {
                 System.err.println(it)
                 exitProcess(1)
             }
-        //        for (result in runF(ast)) {
-        //            try {
-        //                println(result.getOrThrow())
-        //            } catch (e: FRuntimeException) {
-        //                System.err.println(e)
-        //            }
-        //        }
+        for (result in runF(ast)) {
+            try {
+                println(result.getOrThrow())
+            } catch (e: FRuntimeException) {
+                System.err.println(e)
+            }
+        }
     }
 }
 
