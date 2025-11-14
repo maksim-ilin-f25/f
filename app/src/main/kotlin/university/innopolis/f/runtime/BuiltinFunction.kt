@@ -1,7 +1,6 @@
 package university.innopolis.f.runtime
 
-import university.innopolis.f.grammar.FInteger
-import university.innopolis.f.grammar.FReal
+import university.innopolis.f.grammar.*
 
 fun plus(
     target: Wrapper<FValue?>,
@@ -12,54 +11,44 @@ fun plus(
         yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
         return@sequence
     }
-    val (lhs, rhs) = args
-    target.value =
+    val (lhsRaw, rhsRaw) = args
+    val (lhs, rhs) =
         when {
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Integer &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Integer -> {
-                FValue.Quote(
-                    FValueQuoted.Integer(FInteger(lhs.value.value.inner + rhs.value.value.inner))
-                )
+            lhsRaw is FValue.Quote &&
+                lhsRaw.value is FElementQuoted.Literal &&
+                rhsRaw is FValue.Quote &&
+                rhsRaw.value is FElementQuoted.Literal -> {
+                Pair(lhsRaw.value.value, rhsRaw.value.value)
             }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Integer &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Real -> {
-                FValue.Quote(
-                    FValueQuoted.Real(
-                        FReal(lhs.value.value.inner.toBigDecimal() + rhs.value.value.inner)
-                    )
-                )
-            }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Real &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Integer -> {
-                FValue.Quote(
-                    FValueQuoted.Real(
-                        FReal(lhs.value.value.inner + rhs.value.value.inner.toBigDecimal())
-                    )
-                )
-            }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Real &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Real -> {
-                FValue.Quote(
-                    FValueQuoted.Real(FReal(lhs.value.value.inner + rhs.value.value.inner))
-                )
-            }
-
             else -> {
                 yield(Result.failure(FRuntimeException.TypeError()))
                 return@sequence
             }
         }
+
+    target.value =
+        FValue.Quote(
+            FElementQuoted.Literal(
+                when {
+                    lhs is FLiteral.Integer && rhs is FLiteral.Integer -> {
+                        FLiteral.Integer(FInteger(lhs.inner.inner + rhs.inner.inner))
+                    }
+                    lhs is FLiteral.Integer && rhs is FLiteral.Real -> {
+                        FLiteral.Real(FReal(lhs.inner.inner.toBigDecimal() + rhs.inner.inner))
+                    }
+                    lhs is FLiteral.Real && rhs is FLiteral.Integer -> {
+                        FLiteral.Real(FReal(lhs.inner.inner + rhs.inner.inner.toBigDecimal()))
+                    }
+                    lhs is FLiteral.Real && rhs is FLiteral.Real -> {
+                        FLiteral.Real(FReal(lhs.inner.inner + rhs.inner.inner))
+                    }
+                    else -> {
+                        yield(Result.failure(FRuntimeException.TypeError()))
+                        return@sequence
+                    }
+                }
+            )
+        )
 }
 
 fun minus(
@@ -71,54 +60,44 @@ fun minus(
         yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
         return@sequence
     }
-    val (lhs, rhs) = args
-    target.value =
+    val (lhsRaw, rhsRaw) = args
+    val (lhs, rhs) =
         when {
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Integer &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Integer -> {
-                FValue.Quote(
-                    FValueQuoted.Integer(FInteger(lhs.value.value.inner - rhs.value.value.inner))
-                )
+            lhsRaw is FValue.Quote &&
+                lhsRaw.value is FElementQuoted.Literal &&
+                rhsRaw is FValue.Quote &&
+                rhsRaw.value is FElementQuoted.Literal -> {
+                Pair(lhsRaw.value.value, rhsRaw.value.value)
             }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Integer &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Real -> {
-                FValue.Quote(
-                    FValueQuoted.Real(
-                        FReal(lhs.value.value.inner.toBigDecimal() - rhs.value.value.inner)
-                    )
-                )
-            }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Real &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Integer -> {
-                FValue.Quote(
-                    FValueQuoted.Real(
-                        FReal(lhs.value.value.inner - rhs.value.value.inner.toBigDecimal())
-                    )
-                )
-            }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Real &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Real -> {
-                FValue.Quote(
-                    FValueQuoted.Real(FReal(lhs.value.value.inner - rhs.value.value.inner))
-                )
-            }
-
             else -> {
                 yield(Result.failure(FRuntimeException.TypeError()))
                 return@sequence
             }
         }
+
+    target.value =
+        FValue.Quote(
+            FElementQuoted.Literal(
+                when {
+                    lhs is FLiteral.Integer && rhs is FLiteral.Integer -> {
+                        FLiteral.Integer(FInteger(lhs.inner.inner - rhs.inner.inner))
+                    }
+                    lhs is FLiteral.Integer && rhs is FLiteral.Real -> {
+                        FLiteral.Real(FReal(lhs.inner.inner.toBigDecimal() - rhs.inner.inner))
+                    }
+                    lhs is FLiteral.Real && rhs is FLiteral.Integer -> {
+                        FLiteral.Real(FReal(lhs.inner.inner - rhs.inner.inner.toBigDecimal()))
+                    }
+                    lhs is FLiteral.Real && rhs is FLiteral.Real -> {
+                        FLiteral.Real(FReal(lhs.inner.inner - rhs.inner.inner))
+                    }
+                    else -> {
+                        yield(Result.failure(FRuntimeException.TypeError()))
+                        return@sequence
+                    }
+                }
+            )
+        )
 }
 
 fun times(
@@ -130,54 +109,44 @@ fun times(
         yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
         return@sequence
     }
-    val (lhs, rhs) = args
-    target.value =
+    val (lhsRaw, rhsRaw) = args
+    val (lhs, rhs) =
         when {
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Integer &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Integer -> {
-                FValue.Quote(
-                    FValueQuoted.Integer(FInteger(lhs.value.value.inner * rhs.value.value.inner))
-                )
+            lhsRaw is FValue.Quote &&
+                lhsRaw.value is FElementQuoted.Literal &&
+                rhsRaw is FValue.Quote &&
+                rhsRaw.value is FElementQuoted.Literal -> {
+                Pair(lhsRaw.value.value, rhsRaw.value.value)
             }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Integer &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Real -> {
-                FValue.Quote(
-                    FValueQuoted.Real(
-                        FReal(lhs.value.value.inner.toBigDecimal() * rhs.value.value.inner)
-                    )
-                )
-            }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Real &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Integer -> {
-                FValue.Quote(
-                    FValueQuoted.Real(
-                        FReal(lhs.value.value.inner * rhs.value.value.inner.toBigDecimal())
-                    )
-                )
-            }
-
-            lhs is FValue.Quote &&
-                lhs.value is FValueQuoted.Real &&
-                rhs is FValue.Quote &&
-                rhs.value is FValueQuoted.Real -> {
-                FValue.Quote(
-                    FValueQuoted.Real(FReal(lhs.value.value.inner * rhs.value.value.inner))
-                )
-            }
-
             else -> {
                 yield(Result.failure(FRuntimeException.TypeError()))
                 return@sequence
             }
         }
+
+    target.value =
+        FValue.Quote(
+            FElementQuoted.Literal(
+                when {
+                    lhs is FLiteral.Integer && rhs is FLiteral.Integer -> {
+                        FLiteral.Integer(FInteger(lhs.inner.inner * rhs.inner.inner))
+                    }
+                    lhs is FLiteral.Integer && rhs is FLiteral.Real -> {
+                        FLiteral.Real(FReal(lhs.inner.inner.toBigDecimal() * rhs.inner.inner))
+                    }
+                    lhs is FLiteral.Real && rhs is FLiteral.Integer -> {
+                        FLiteral.Real(FReal(lhs.inner.inner * rhs.inner.inner.toBigDecimal()))
+                    }
+                    lhs is FLiteral.Real && rhs is FLiteral.Real -> {
+                        FLiteral.Real(FReal(lhs.inner.inner * rhs.inner.inner))
+                    }
+                    else -> {
+                        yield(Result.failure(FRuntimeException.TypeError()))
+                        return@sequence
+                    }
+                }
+            )
+        )
 }
 
 fun divide(
@@ -189,64 +158,49 @@ fun divide(
         yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
         return@sequence
     }
-    val (lhs, rhs) = args
+    val (lhsRaw, rhsRaw) = args
+    val (lhs, rhs) =
+        when {
+            lhsRaw is FValue.Quote &&
+                lhsRaw.value is FElementQuoted.Literal &&
+                rhsRaw is FValue.Quote &&
+                rhsRaw.value is FElementQuoted.Literal -> {
+                Pair(lhsRaw.value.value, rhsRaw.value.value)
+            }
+            else -> {
+                yield(Result.failure(FRuntimeException.TypeError()))
+                return@sequence
+            }
+        }
 
     try {
         target.value =
-            when {
-                lhs is FValue.Quote &&
-                    lhs.value is FValueQuoted.Integer &&
-                    rhs is FValue.Quote &&
-                    rhs.value is FValueQuoted.Integer -> {
-                    FValue.Quote(
-                        FValueQuoted.Integer(
-                            FInteger(lhs.value.value.inner.divide(rhs.value.value.inner))
-                        )
-                    )
-                }
-
-                lhs is FValue.Quote &&
-                    lhs.value is FValueQuoted.Integer &&
-                    rhs is FValue.Quote &&
-                    rhs.value is FValueQuoted.Real -> {
-                    FValue.Quote(
-                        FValueQuoted.Real(
-                            FReal(
-                                lhs.value.value.inner.toBigDecimal().divide(rhs.value.value.inner)
+            FValue.Quote(
+                FElementQuoted.Literal(
+                    when {
+                        lhs is FLiteral.Integer && rhs is FLiteral.Integer -> {
+                            FLiteral.Integer(FInteger(lhs.inner.inner.divide(rhs.inner.inner)))
+                        }
+                        lhs is FLiteral.Integer && rhs is FLiteral.Real -> {
+                            FLiteral.Real(
+                                FReal(lhs.inner.inner.toBigDecimal().divide(rhs.inner.inner))
                             )
-                        )
-                    )
-                }
-
-                lhs is FValue.Quote &&
-                    lhs.value is FValueQuoted.Real &&
-                    rhs is FValue.Quote &&
-                    rhs.value is FValueQuoted.Integer -> {
-                    FValue.Quote(
-                        FValueQuoted.Real(
-                            FReal(
-                                lhs.value.value.inner.divide(rhs.value.value.inner.toBigDecimal())
+                        }
+                        lhs is FLiteral.Real && rhs is FLiteral.Integer -> {
+                            FLiteral.Real(
+                                FReal(lhs.inner.inner.divide(rhs.inner.inner.toBigDecimal()))
                             )
-                        )
-                    )
-                }
-
-                lhs is FValue.Quote &&
-                    lhs.value is FValueQuoted.Real &&
-                    rhs is FValue.Quote &&
-                    rhs.value is FValueQuoted.Real -> {
-                    FValue.Quote(
-                        FValueQuoted.Real(
-                            FReal(lhs.value.value.inner.divide(rhs.value.value.inner))
-                        )
-                    )
-                }
-
-                else -> {
-                    yield(Result.failure(FRuntimeException.TypeError()))
-                    return@sequence
-                }
-            }
+                        }
+                        lhs is FLiteral.Real && rhs is FLiteral.Real -> {
+                            FLiteral.Real(FReal(lhs.inner.inner.divide(rhs.inner.inner)))
+                        }
+                        else -> {
+                            yield(Result.failure(FRuntimeException.TypeError()))
+                            return@sequence
+                        }
+                    }
+                )
+            )
     } catch (_: Exception) {
         yield(Result.failure(FRuntimeException.DivisionByZero()))
     }
@@ -263,16 +217,23 @@ fun head(
     }
 
     val quote = args.first()
-    if (quote !is FValue.Quote || quote.value !is FValueQuoted.ValueList) {
+    if (quote !is FValue.Quote || quote.value !is FElementQuoted.List) {
         yield(Result.failure(FRuntimeException.TypeError()))
         return@sequence
     }
 
-    val headElement = quote.value.value.firstOrNull()
+    val headElement = quote.value.value.elements.firstOrNull()
     if (headElement == null) {
         yield(Result.failure(FRuntimeException.NotEnoughElements()))
         return@sequence
     }
 
-    target.value = headElement
+    target.value =
+        FValue.Quote(
+            when (headElement) {
+                is FElement.Atom -> FElementQuoted.Atom(headElement.value)
+                is FElement.List -> FElementQuoted.List(headElement.value)
+                is FElement.Quote -> FElementQuoted.Quote(headElement.value)
+            }
+        )
 }
