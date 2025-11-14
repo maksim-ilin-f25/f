@@ -7,14 +7,18 @@ import university.innopolis.f.runtime.FunCall
 
 @JvmInline
 value class FList(val elements: MutableList<FElement>) {
-    override fun toString() = "${this.elements}"
+    override fun toString() = this.elements.toString()
 
     fun funNameOrNull(): FAtom? {
         val name = this.elements.firstOrNull()
-        if (name !is FElement.Atom) {
-            return null
+        return when (name) {
+            is FElement.Quote ->
+                when (name.value) {
+                    is FElementQuoted.Atom -> name.value.value
+                    else -> null
+                }
+            else -> null
         }
-        return name.value
     }
 
     fun argsOrNull(): List<FElement>? {
@@ -43,12 +47,12 @@ value class FList(val elements: MutableList<FElement>) {
             while (res.second) {
                 res =
                     parseElement(
-                        allTokens = allTokens,
-                        currentElemIndex = res.first,
-                        buffer = self.elements,
-                        openParCoordinate = allTokens.getOrNull(firstElemIndex - 1)?.coordinate,
-                        isFirstRun = isFirstRun,
-                    )
+                            allTokens = allTokens,
+                            currentElemIndex = res.first,
+                            buffer = self.elements,
+                            openParCoordinate = allTokens.getOrNull(firstElemIndex - 1)?.coordinate,
+                            isFirstRun = isFirstRun,
+                        )
                         .getOrElse {
                             return Result.failure(it)
                         }
@@ -76,10 +80,10 @@ value class FList(val elements: MutableList<FElement>) {
                 is FToken.OpeningParenthesis -> { // recursion
                     val (listAst, nextIndex) =
                         parse(
-                            allTokens = allTokens,
-                            firstElemIndex = currentElemIndex + 1,
-                            isFirstRun = false,
-                        )
+                                allTokens = allTokens,
+                                firstElemIndex = currentElemIndex + 1,
+                                isFirstRun = false,
+                            )
                             .getOrElse {
                                 return Result.failure(it)
                             }
@@ -97,30 +101,50 @@ value class FList(val elements: MutableList<FElement>) {
                 }
 
                 is FToken.Atom -> {
-                    buffer.add(FElement.Atom(currentToken.value))
+                    buffer.add(FElement.Quote(FElementQuoted.Atom(currentToken.value)))
                 }
 
                 is FToken.Literal -> {
-                    buffer.add(FElement.Literal(currentToken.value))
+                    buffer.add(FElement.Quote(FElementQuoted.Literal(currentToken.value)))
                 }
 
                 is FToken.Keyword -> {
-                    buffer.add(FElement.Keyword(currentToken.value))
+                    buffer.add(FElement.Quote(FElementQuoted.Keyword(currentToken.value)))
                 }
 
                 is FToken.Quote -> {
                     val res =
                         parseElement(
-                            allTokens = allTokens,
-                            currentElemIndex = currentElemIndex + 1,
-                            buffer = buffer,
-                            openParCoordinate = openParCoordinate,
-                            isFirstRun = false,
-                        )
+                                allTokens = allTokens,
+                                currentElemIndex = currentElemIndex + 1,
+                                buffer = buffer,
+                                openParCoordinate = openParCoordinate,
+                                isFirstRun = false,
+                            )
                             .getOrElse {
                                 return Result.failure(it)
                             }
-                    buffer[buffer.lastIndex] = FElement.Quote(buffer.last())
+                    val last = buffer.last()
+                    buffer[buffer.lastIndex] =
+                        FElement.Quote(
+                            when (last) {
+                                is FElement.List -> FElementQuoted.List(last.value)
+                                is FElement.Quote ->
+                                    when (last.value) {
+                                        is FElementQuoted.List ->
+                                            FElementQuoted.Quote(
+                                                FElementQuoted.List(last.value.value)
+                                            )
+                                        is FElementQuoted.Atom ->
+                                            FElementQuoted.Atom(last.value.value)
+                                        is FElementQuoted.Keyword ->
+                                            FElementQuoted.Keyword(last.value.value)
+                                        is FElementQuoted.Literal ->
+                                            FElementQuoted.Literal(last.value.value)
+                                        is FElementQuoted.Quote -> FElementQuoted.Quote(last.value)
+                                    }
+                            }
+                        )
                     return Result.success(res)
                 }
             }
