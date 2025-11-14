@@ -8,6 +8,10 @@ sealed class FElement {
     data class Quote(val value: FElementQuoted) : FElement() {
         override fun toString() = value.toString()
     }
+
+    data class Atom(val value: FAtom) : FElement() {
+        override fun toString() = value.name
+    }
 }
 
 sealed class FElementQuoted {

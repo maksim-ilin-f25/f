@@ -1,5 +1,6 @@
 package university.innopolis.f.grammar
 
+import university.innopolis.f.grammar.FElementQuoted.*
 import university.innopolis.f.lexer.Coordinate
 import university.innopolis.f.lexer.FToken
 import university.innopolis.f.parser.ParseException
@@ -101,7 +102,7 @@ value class FListAst(val elements: MutableList<FElement>) {
                 }
 
                 is FToken.Atom -> {
-                    buffer.add(FElement.Quote(FElementQuoted.Atom(currentToken.value)))
+                    buffer.add(FElement.Atom(currentToken.value))
                 }
 
                 is FToken.Literal -> {
@@ -128,20 +129,16 @@ value class FListAst(val elements: MutableList<FElement>) {
                     buffer[buffer.lastIndex] =
                         FElement.Quote(
                             when (last) {
+                                is FElement.Atom -> FElementQuoted.Atom(last.value)
                                 is FElement.List -> FElementQuoted.List(last.value)
                                 is FElement.Quote ->
                                     when (last.value) {
                                         is FElementQuoted.List ->
-                                            FElementQuoted.Quote(
-                                                FElementQuoted.List(last.value.value)
-                                            )
-                                        is FElementQuoted.Atom ->
-                                            FElementQuoted.Atom(last.value.value)
-                                        is FElementQuoted.Keyword ->
-                                            FElementQuoted.Keyword(last.value.value)
-                                        is FElementQuoted.Literal ->
-                                            FElementQuoted.Literal(last.value.value)
-                                        is FElementQuoted.Quote -> FElementQuoted.Quote(last.value)
+                                            Quote(FElementQuoted.List(last.value.value))
+                                        is FElementQuoted.Atom -> Atom(last.value.value)
+                                        is FElementQuoted.Keyword -> Keyword(last.value.value)
+                                        is FElementQuoted.Literal -> Literal(last.value.value)
+                                        is FElementQuoted.Quote -> Quote(last.value)
                                     }
                             }
                         )

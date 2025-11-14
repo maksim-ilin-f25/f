@@ -70,17 +70,18 @@ fun evaluateElementTo(
     context: FContext,
 ): Sequence<Result<FValue>> = sequence {
     when (element) {
+        is FElement.Atom -> {
+            val value = context.valueOf(element.value)
+            if (value == null) {
+                yield(Result.failure(FRuntimeException.UnboundAtom()))
+                return@sequence
+            }
+            value
+        }
         is FElement.Quote -> {
             target.value =
                 when (element.value) {
-                    is FElementQuoted.Atom -> {
-                        val value = context.valueOf(element.value.value)
-                        if (value == null) {
-                            yield(Result.failure(FRuntimeException.UnboundAtom()))
-                            return@sequence
-                        }
-                        value
-                    }
+                    is FElementQuoted.Atom -> FValue.Quote(FValueQuoted.Atom(element.value.value))
                     is FElementQuoted.List -> FValue.Quote(FValueQuoted.Ast(element.value))
                     is FElementQuoted.Literal -> FValue.fromLiteral(element.value.value)
                     is FElementQuoted.Quote ->

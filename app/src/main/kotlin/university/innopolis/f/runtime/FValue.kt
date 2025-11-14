@@ -27,6 +27,10 @@ sealed class FValue() {
 }
 
 sealed class FValueQuoted() {
+    data class Atom(val value: FAtom) : FValueQuoted() {
+        override fun toString() = value.toString()
+    }
+
     data class Integer(val value: FInteger) : FValueQuoted() {
         override fun toString() = value.toString()
     }
