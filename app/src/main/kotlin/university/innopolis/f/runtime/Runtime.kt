@@ -65,9 +65,9 @@ fun evaluateElementTo(
     element: FElement,
     context: FContext,
 ): Sequence<Result<FValue>> = sequence {
-    target.value =
-        when (element) {
-            is FElement.Quote -> {
+    when (element) {
+        is FElement.Quote -> {
+            target.value =
                 when (element.value) {
                     is FElementQuoted.Atom -> {
                         val value = context.valueOf(element.value.value)
@@ -85,39 +85,37 @@ fun evaluateElementTo(
                         return@sequence
                     }
                 }
+        }
+        is FElement.List -> {
+            val funCall = element.value.toFunCallOrNull()
+            if (funCall == null) {
+                yield(Result.failure(FRuntimeException.MalformedFunCall()))
+                return@sequence
             }
-            is FElement.List -> {
-                val funCall = element.value.toFunCallOrNull()
-                if (funCall == null) {
-                    yield(Result.failure(FRuntimeException.MalformedFunCall()))
+            val function = context.valueOf(funCall.name)
+            if (function == null) {
+                yield(Result.failure(FRuntimeException.UnboundAtom()))
+                return@sequence
+            }
+            if (function !is FValue.Function) {
+                yield(Result.failure(FRuntimeException.NotAFunction()))
+                return@sequence
+            }
+
+            val args = mutableListOf<FValue>()
+            for (result in evaluateListTo(args, funCall.args, context)) {
+                yield(result)
+                if (result.isFailure) {
                     return@sequence
                 }
-                val function = context.valueOf(funCall.name)
-                if (function == null) {
-                    yield(Result.failure(FRuntimeException.UnboundAtom()))
+            }
+
+            for (result in function.value.call(target, args, context)) {
+                yield(result)
+                if (result.isFailure) {
                     return@sequence
                 }
-                if (function !is FValue.Function) {
-                    yield(Result.failure(FRuntimeException.NotAFunction()))
-                    return@sequence
-                }
-
-                val args = mutableListOf<FValue>()
-                for (result in evaluateListTo(args, funCall.args, context)) {
-                    yield(result)
-                    if (result.isFailure) {
-                        return@sequence
-                    }
-                }
-
-                for (result in function.value.call(args, context)) {
-                    yield(result)
-                    if (result.isFailure) {
-                        return@sequence
-                    }
-                }
-
-                TODO("put here the return value for `target`")
             }
         }
+    }
 }
