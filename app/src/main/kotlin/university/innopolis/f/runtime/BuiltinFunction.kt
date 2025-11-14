@@ -233,7 +233,15 @@ fun head(
             when (headElement) {
                 is FElement.Atom -> FElementQuoted.Atom(headElement.value)
                 is FElement.List -> FElementQuoted.List(headElement.value)
-                is FElement.Quote -> FElementQuoted.Quote(headElement.value)
+                is FElement.Quote -> {
+                    when (headElement.value) {
+                        is FElementQuoted.Atom -> FElementQuoted.Atom(headElement.value.value)
+                        is FElementQuoted.Keyword -> FElementQuoted.Keyword(headElement.value.value)
+                        is FElementQuoted.List -> FElementQuoted.List(headElement.value.value)
+                        is FElementQuoted.Literal -> FElementQuoted.Literal(headElement.value.value)
+                        is FElementQuoted.Quote -> FElementQuoted.Quote(headElement.value.value)
+                    }
+                }
             }
         )
 }
