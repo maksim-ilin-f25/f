@@ -255,7 +255,7 @@ fun divide(
 fun head(
     target: Wrapper<FValue?>,
     args: List<FValue>,
-    context: FContext,
+    _context: FContext,
 ): Sequence<Result<FValue>> = sequence {
     if (args.size != 1) {
         yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
@@ -268,19 +268,11 @@ fun head(
         return@sequence
     }
 
-    val list = mutableListOf<FValue>()
-    TODO("I DONT WHAT THAT FUNCTION TO ACCCEPT AN AST")
-    //    for (result in evaluateListTo(list, quote.value.value, context)) {
-    //        yield(result)
-    //        if (result.isFailure) {
-    //            return@sequence
-    //        }
-    //    }
-
-    if (list.isEmpty()) {
+    val headElement = quote.value.value.firstOrNull()
+    if (headElement == null) {
         yield(Result.failure(FRuntimeException.NotEnoughElements()))
         return@sequence
     }
 
-    yield(Result.success(list.first()))
+    target.value = headElement
 }
