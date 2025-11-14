@@ -13,11 +13,7 @@ value class FListAst(val elements: MutableList<FElement>) {
     fun funNameOrNull(): FAtom? {
         val name = this.elements.firstOrNull()
         return when (name) {
-            is FElement.Quote ->
-                when (name.value) {
-                    is FElementQuoted.Atom -> name.value.value
-                    else -> null
-                }
+            is FElement.Atom -> name.value
             else -> null
         }
     }
