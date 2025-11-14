@@ -39,7 +39,7 @@ sealed class FValueQuoted() {
         override fun toString() = value.toString()
     }
 
-    data class AstList(val value: FListAst) : FValueQuoted() {
+    data class Ast(val value: FElementQuoted) : FValueQuoted() {
         override fun toString() = TODO()
     }
 

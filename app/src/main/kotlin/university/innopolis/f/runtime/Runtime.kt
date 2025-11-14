@@ -81,10 +81,12 @@ fun evaluateElementTo(
                         }
                         value
                     }
-                    is FElementQuoted.List ->
-                        FValue.Quote(FValueQuoted.AstList(element.value.value))
+                    is FElementQuoted.List -> FValue.Quote(FValueQuoted.Ast(element.value))
                     is FElementQuoted.Literal -> FValue.fromLiteral(element.value.value)
-                    is FElementQuoted.Quote -> FValue.Quote(TODO())
+                    is FElementQuoted.Quote ->
+                        FValue.Quote(
+                            FValueQuoted.Quote(FValueQuoted.Ast(element.value))
+                        ) // SUS: may be wrong
                     is FElementQuoted.Keyword -> {
                         yield(Result.failure(FRuntimeException.StandaloneKeyword()))
                         return@sequence
