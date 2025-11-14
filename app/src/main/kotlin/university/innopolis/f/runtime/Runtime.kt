@@ -1,45 +1,49 @@
 package university.innopolis.f.runtime
 
+import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
 import university.innopolis.f.grammar.FElementQuoted
 
-// fun runF(ast: List<FElement>): Sequence<Result<String>> {
-//    val rootContext = FContext(parent = null)
-//
-//    rootContext.set(
-//        FAtom("plus"),
-//        FValue.Function(FFunction.Builtin { args, context -> plus(args, context) }),
-//    )
-//    rootContext.set(
-//        FAtom("minus"),
-//        FValue.Function(FFunction.Builtin { args, context -> minus(args, context) }),
-//    )
-//    rootContext.set(
-//        FAtom("times"),
-//        FValue.Function(FFunction.Builtin { args, context -> times(args, context) }),
-//    )
-//    rootContext.set(
-//        FAtom("divide"),
-//        FValue.Function(FFunction.Builtin { args, context -> divide(args, context) }),
-//    )
-//    rootContext.set(
-//        FAtom("head"),
-//        FValue.Function(FFunction.Builtin { args, context -> head(args, context) }),
-//    )
-//
-//    val context = FContext(parent = rootContext)
-//    return sequence {
-//        outer@ for (element in ast) {
-//            TODO("runElement no longer exists")
-//            for (result in runElement(element, context)) {
-//                yield(result.map { it.display() })
-//                if (result.isFailure) {
-//                    break@outer
-//                }
-//            }
-//        }
-//    }
-// }
+fun runF(ast: List<FElement>): Sequence<Result<String>> {
+    val rootContext = FContext(parent = null)
+
+    rootContext.set(
+        FAtom("plus"),
+        FValue.Function(FFunction.Builtin { target, args, context -> plus(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("minus"),
+        FValue.Function(FFunction.Builtin { target, args, context -> minus(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("times"),
+        FValue.Function(FFunction.Builtin { target, args, context -> times(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("divide"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> divide(target, args, context) }
+        ),
+    )
+    rootContext.set(
+        FAtom("head"),
+        FValue.Function(FFunction.Builtin { target, args, context -> head(target, args, context) }),
+    )
+
+    val context = FContext(parent = rootContext)
+    return sequence {
+        outer@ for (element in ast) {
+            val evaluatedValue = Wrapper<FValue?>(null)
+            for (result in evaluateElementTo(evaluatedValue, element, context)) {
+                yield(result.map { it.toString() })
+                if (result.isFailure) {
+                    break@outer
+                }
+            }
+            yield(Result.success(evaluatedValue.value!!.toString()))
+        }
+    }
+}
 
 fun evaluateListTo(
     list: MutableList<FValue>,
