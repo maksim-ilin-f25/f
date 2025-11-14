@@ -1,9 +1,6 @@
 package university.innopolis.f.runtime
 
-import university.innopolis.f.grammar.FBoolean
-import university.innopolis.f.grammar.FInteger
-import university.innopolis.f.grammar.FLiteral
-import university.innopolis.f.grammar.FReal
+import university.innopolis.f.grammar.*
 
 sealed class FValue() {
     data class Quote(val value: FValueQuoted) : FValue() {
@@ -40,6 +37,10 @@ sealed class FValueQuoted() {
 
     data class Quote(val value: FValueQuoted) : FValueQuoted() {
         override fun toString() = value.toString()
+    }
+
+    data class AstList(val value: FListAst) : FValueQuoted() {
+        override fun toString() = TODO()
     }
 
     data class ValueList(val value: List<FValue>) : FValueQuoted() {

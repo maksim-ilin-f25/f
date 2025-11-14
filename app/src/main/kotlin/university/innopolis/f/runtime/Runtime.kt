@@ -81,7 +81,8 @@ fun evaluateElementTo(
                         }
                         value
                     }
-                    is FElementQuoted.List -> FValue.Quote(FValueQuoted.ValueList(TODO()))
+                    is FElementQuoted.List ->
+                        FValue.Quote(FValueQuoted.AstList(element.value.value))
                     is FElementQuoted.Literal -> FValue.fromLiteral(element.value.value)
                     is FElementQuoted.Quote -> FValue.Quote(TODO())
                     is FElementQuoted.Keyword -> {
