@@ -128,14 +128,16 @@ value class FListAst(val elements: MutableList<FElement>) {
                                 is FElement.Atom -> FElementQuoted.Atom(last.value)
                                 is FElement.List -> FElementQuoted.List(last.value)
                                 is FElement.Quote ->
-                                    when (last.value) {
-                                        is FElementQuoted.List ->
-                                            Quote(FElementQuoted.List(last.value.value))
-                                        is FElementQuoted.Atom -> Atom(last.value.value)
-                                        is FElementQuoted.Keyword -> Keyword(last.value.value)
-                                        is FElementQuoted.Literal -> Literal(last.value.value)
-                                        is FElementQuoted.Quote -> Quote(last.value)
-                                    }
+                                    FElementQuoted.Quote(
+                                        when (last.value) {
+                                            is FElementQuoted.List ->
+                                                Quote(FElementQuoted.List(last.value.value))
+                                            is FElementQuoted.Atom -> Atom(last.value.value)
+                                            is FElementQuoted.Keyword -> Keyword(last.value.value)
+                                            is FElementQuoted.Literal -> Literal(last.value.value)
+                                            is FElementQuoted.Quote -> Quote(last.value)
+                                        }
+                                    )
                             }
                         )
                     return Result.success(res)
