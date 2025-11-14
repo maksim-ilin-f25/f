@@ -6,7 +6,7 @@ import university.innopolis.f.parser.ParseException
 import university.innopolis.f.runtime.FunCall
 
 @JvmInline
-value class FList(val elements: MutableList<FElement>) {
+value class FListAst(val elements: MutableList<FElement>) {
     override fun toString() = this.elements.toString()
 
     fun funNameOrNull(): FAtom? {
@@ -40,8 +40,8 @@ value class FList(val elements: MutableList<FElement>) {
             allTokens: List<FToken>,
             firstElemIndex: Int,
             isFirstRun: Boolean,
-        ): Result<Pair<FList, Int>> {
-            val self = FList(emptyList<FElement>().toMutableList())
+        ): Result<Pair<FListAst, Int>> {
+            val self = FListAst(emptyList<FElement>().toMutableList())
 
             var res = Pair(firstElemIndex, true)
             while (res.second) {

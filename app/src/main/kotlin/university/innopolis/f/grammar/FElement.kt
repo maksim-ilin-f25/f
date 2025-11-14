@@ -1,7 +1,7 @@
 package university.innopolis.f.grammar
 
 sealed class FElement {
-    data class List(val value: FList) : FElement() {
+    data class List(val value: FListAst) : FElement() {
         override fun toString() = "(${this.value.elements.joinToString(" ")})"
     }
 
@@ -19,7 +19,7 @@ sealed class FElementQuoted {
         override fun toString() = value.toString()
     }
 
-    data class List(val value: FList) : FElementQuoted() {
+    data class List(val value: FListAst) : FElementQuoted() {
         override fun toString() = "(${this.value.elements.joinToString(" ")})"
     }
 

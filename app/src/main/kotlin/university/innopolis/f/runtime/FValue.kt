@@ -1,26 +1,13 @@
 package university.innopolis.f.runtime
 
-import university.innopolis.f.grammar.*
+import university.innopolis.f.grammar.FBoolean
+import university.innopolis.f.grammar.FInteger
+import university.innopolis.f.grammar.FLiteral
+import university.innopolis.f.grammar.FReal
 
 sealed class FValue() {
-    data class Integer(val value: FInteger) : FValue() {
+    data class Quote(val value: FValueQuoted) : FValue() {
         override fun toString() = value.toString()
-    }
-
-    data class Real(val value: FReal) : FValue() {
-        override fun toString() = value.toString()
-    }
-
-    data class Quote(val value: FElement) : FValue() {
-        override fun toString() = value.toString()
-    }
-
-    data class Boolean(val value: FBoolean) : FValue() {
-        override fun toString() = value.toString()
-    }
-
-    data object Null : FValue() {
-        override fun toString() = "null"
     }
 
     data class Function(val value: FFunction) : FValue() {
@@ -30,13 +17,40 @@ sealed class FValue() {
     }
 
     companion object {
-        fun fromLiteral(literal: FLiteral): FValue {
-            return when (literal) {
-                is FLiteral.Integer -> FValue.Integer(literal.inner)
-                is FLiteral.Boolean -> FValue.Boolean(literal.inner)
-                is FLiteral.Null -> FValue.Null
-                is FLiteral.Real -> FValue.Real(literal.inner)
-            }
-        }
+        fun fromLiteral(literal: FLiteral) =
+            FValue.Quote(
+                when (literal) {
+                    is FLiteral.Integer -> FValueQuoted.Integer(literal.inner)
+                    is FLiteral.Boolean -> FValueQuoted.Boolean(literal.inner)
+                    is FLiteral.Null -> FValueQuoted.Null
+                    is FLiteral.Real -> FValueQuoted.Real(literal.inner)
+                }
+            )
+    }
+}
+
+sealed class FValueQuoted() {
+    data class Integer(val value: FInteger) : FValueQuoted() {
+        override fun toString() = value.toString()
+    }
+
+    data class Real(val value: FReal) : FValueQuoted() {
+        override fun toString() = value.toString()
+    }
+
+    data class Quote(val value: FValueQuoted) : FValueQuoted() {
+        override fun toString() = value.toString()
+    }
+
+    data class ValueList(val value: List<FValue>) : FValueQuoted() {
+        override fun toString() = TODO()
+    }
+
+    data class Boolean(val value: FBoolean) : FValueQuoted() {
+        override fun toString() = value.toString()
+    }
+
+    data object Null : FValueQuoted() {
+        override fun toString() = "null"
     }
 }
