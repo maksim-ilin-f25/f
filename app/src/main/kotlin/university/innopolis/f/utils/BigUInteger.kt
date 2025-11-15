@@ -1,7 +1,7 @@
 package university.innopolis.f.utils
 
-import university.innopolis.f.grammar.FDecimalDigit
 import java.math.BigInteger
+import university.innopolis.f.grammar.FDecimalDigit
 
 @JvmInline
 value class BigUInteger(private val inner: BigInteger) {
