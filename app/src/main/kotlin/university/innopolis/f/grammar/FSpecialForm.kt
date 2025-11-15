@@ -35,6 +35,10 @@ sealed class FSpecialForm {
                     return@sequence
                 }
             }
+            if (evaluated.value == null) {
+                yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
+                return@sequence
+            }
             context.set(name, evaluated.value!!)
         }
 

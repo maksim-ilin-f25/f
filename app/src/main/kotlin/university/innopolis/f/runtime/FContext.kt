@@ -2,7 +2,7 @@ package university.innopolis.f.runtime
 
 import university.innopolis.f.grammar.FAtom
 
-data class FContext(val parent: FContext?) {
+class FContext(val parent: FContext?) {
     val locals = mutableMapOf<FAtom, FValue>()
 
     fun valueOf(atom: FAtom): FValue? {

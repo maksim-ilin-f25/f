@@ -36,4 +36,9 @@ sealed class FRuntimeException() : IllegalArgumentException() {
     class NotEnoughElements() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
+
+    /** `(setq a (setq b 1))` */
+    class UseOfNonexistentValue() : FRuntimeException() {
+        override fun toString(): String = TODO()
+    }
 }

@@ -60,6 +60,10 @@ fun evaluateListTo(
                 return@sequence
             }
         }
+        if (element.value == null) {
+            yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
+            return@sequence
+        }
         list.add(element.value!!)
     }
 }
