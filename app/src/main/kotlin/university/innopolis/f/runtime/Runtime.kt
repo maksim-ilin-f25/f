@@ -68,8 +68,6 @@ fun evaluateElementTo(
     element: FElement,
     context: FContext,
 ): Sequence<Result<FValue>> = sequence {
-    println("Processing element: $element (${element.javaClass})")
-
     target.value =
         when (element) {
             is FElement.Literal -> FValue.Quote(element)
