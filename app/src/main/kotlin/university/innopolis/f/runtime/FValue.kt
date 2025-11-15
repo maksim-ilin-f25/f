@@ -1,10 +1,9 @@
 package university.innopolis.f.runtime
 
-import university.innopolis.f.grammar.FElementQuoted
-import university.innopolis.f.grammar.FLiteral
+import university.innopolis.f.grammar.FElement
 
 sealed class FValue() {
-    data class Quote(val value: FElementQuoted) : FValue() {
+    data class Quote(val value: FElement) : FValue() {
         override fun toString() = value.toString()
     }
 
@@ -12,9 +11,5 @@ sealed class FValue() {
         override fun toString(): String {
             TODO()
         }
-    }
-
-    companion object {
-        fun fromLiteral(literal: FLiteral) = FValue.Quote(FElementQuoted.Literal(literal))
     }
 }

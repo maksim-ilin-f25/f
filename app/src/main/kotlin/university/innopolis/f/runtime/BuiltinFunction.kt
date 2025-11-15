@@ -1,6 +1,9 @@
 package university.innopolis.f.runtime
 
-import university.innopolis.f.grammar.*
+import university.innopolis.f.grammar.FElement
+import university.innopolis.f.grammar.FInteger
+import university.innopolis.f.grammar.FLiteral
+import university.innopolis.f.grammar.FReal
 
 fun plus(
     target: Wrapper<FValue?>,
@@ -15,9 +18,9 @@ fun plus(
     val (lhs, rhs) =
         when {
             lhsRaw is FValue.Quote &&
-                lhsRaw.value is FElementQuoted.Literal &&
+                lhsRaw.value is FElement.Literal &&
                 rhsRaw is FValue.Quote &&
-                rhsRaw.value is FElementQuoted.Literal -> {
+                rhsRaw.value is FElement.Literal -> {
                 Pair(lhsRaw.value.value, rhsRaw.value.value)
             }
             else -> {
@@ -28,7 +31,7 @@ fun plus(
 
     target.value =
         FValue.Quote(
-            FElementQuoted.Literal(
+            FElement.Literal(
                 when {
                     lhs is FLiteral.Integer && rhs is FLiteral.Integer -> {
                         FLiteral.Integer(FInteger(lhs.inner.inner + rhs.inner.inner))
@@ -64,9 +67,9 @@ fun minus(
     val (lhs, rhs) =
         when {
             lhsRaw is FValue.Quote &&
-                lhsRaw.value is FElementQuoted.Literal &&
+                lhsRaw.value is FElement.Literal &&
                 rhsRaw is FValue.Quote &&
-                rhsRaw.value is FElementQuoted.Literal -> {
+                rhsRaw.value is FElement.Literal -> {
                 Pair(lhsRaw.value.value, rhsRaw.value.value)
             }
             else -> {
@@ -77,7 +80,7 @@ fun minus(
 
     target.value =
         FValue.Quote(
-            FElementQuoted.Literal(
+            FElement.Literal(
                 when {
                     lhs is FLiteral.Integer && rhs is FLiteral.Integer -> {
                         FLiteral.Integer(FInteger(lhs.inner.inner - rhs.inner.inner))
@@ -113,9 +116,9 @@ fun times(
     val (lhs, rhs) =
         when {
             lhsRaw is FValue.Quote &&
-                lhsRaw.value is FElementQuoted.Literal &&
+                lhsRaw.value is FElement.Literal &&
                 rhsRaw is FValue.Quote &&
-                rhsRaw.value is FElementQuoted.Literal -> {
+                rhsRaw.value is FElement.Literal -> {
                 Pair(lhsRaw.value.value, rhsRaw.value.value)
             }
             else -> {
@@ -126,7 +129,7 @@ fun times(
 
     target.value =
         FValue.Quote(
-            FElementQuoted.Literal(
+            FElement.Literal(
                 when {
                     lhs is FLiteral.Integer && rhs is FLiteral.Integer -> {
                         FLiteral.Integer(FInteger(lhs.inner.inner * rhs.inner.inner))
@@ -162,9 +165,9 @@ fun divide(
     val (lhs, rhs) =
         when {
             lhsRaw is FValue.Quote &&
-                lhsRaw.value is FElementQuoted.Literal &&
+                lhsRaw.value is FElement.Literal &&
                 rhsRaw is FValue.Quote &&
-                rhsRaw.value is FElementQuoted.Literal -> {
+                rhsRaw.value is FElement.Literal -> {
                 Pair(lhsRaw.value.value, rhsRaw.value.value)
             }
             else -> {
@@ -176,7 +179,7 @@ fun divide(
     try {
         target.value =
             FValue.Quote(
-                FElementQuoted.Literal(
+                FElement.Literal(
                     when {
                         lhs is FLiteral.Integer && rhs is FLiteral.Integer -> {
                             FLiteral.Integer(FInteger(lhs.inner.inner.divide(rhs.inner.inner)))
@@ -217,7 +220,7 @@ fun head(
     }
 
     val quote = args.first()
-    if (quote !is FValue.Quote || quote.value !is FElementQuoted.List) {
+    if (quote !is FValue.Quote || quote.value !is FElement.List) {
         yield(Result.failure(FRuntimeException.TypeError()))
         return@sequence
     }
@@ -228,20 +231,5 @@ fun head(
         return@sequence
     }
 
-    target.value =
-        FValue.Quote(
-            when (headElement) {
-                is FElement.Atom -> FElementQuoted.Atom(headElement.value)
-                is FElement.List -> FElementQuoted.List(headElement.value)
-                is FElement.Quote -> {
-                    when (headElement.value) {
-                        is FElementQuoted.Atom -> FElementQuoted.Atom(headElement.value.value)
-                        is FElementQuoted.Keyword -> FElementQuoted.Keyword(headElement.value.value)
-                        is FElementQuoted.List -> FElementQuoted.List(headElement.value.value)
-                        is FElementQuoted.Literal -> FElementQuoted.Literal(headElement.value.value)
-                        is FElementQuoted.Quote -> FElementQuoted.Quote(headElement.value.value)
-                    }
-                }
-            }
-        )
+    target.value = FValue.Quote(headElement)
 }

@@ -1,6 +1,5 @@
 package university.innopolis.f.grammar
 
-import university.innopolis.f.grammar.FElementQuoted.*
 import university.innopolis.f.lexer.Coordinate
 import university.innopolis.f.lexer.FToken
 import university.innopolis.f.parser.ParseException
@@ -102,11 +101,11 @@ value class FListAst(val elements: MutableList<FElement>) {
                 }
 
                 is FToken.Literal -> {
-                    buffer.add(FElement.Quote(FElementQuoted.Literal(currentToken.value)))
+                    buffer.add(FElement.Quote(FElement.Literal(currentToken.value)))
                 }
 
                 is FToken.Keyword -> {
-                    buffer.add(FElement.Quote(FElementQuoted.Keyword(currentToken.value)))
+                    buffer.add(FElement.Quote(FElement.Keyword(currentToken.value)))
                 }
 
                 is FToken.Quote -> {
@@ -122,23 +121,7 @@ value class FListAst(val elements: MutableList<FElement>) {
                                 return Result.failure(it)
                             }
                     val last = buffer.last()
-                    buffer[buffer.lastIndex] =
-                        FElement.Quote(
-                            when (last) {
-                                is FElement.Atom -> FElementQuoted.Atom(last.value)
-                                is FElement.List -> FElementQuoted.List(last.value)
-                                is FElement.Quote ->
-                                    when (last.value) {
-                                        is FElementQuoted.List ->
-                                            Quote(FElementQuoted.List(last.value.value))
-                                        is FElementQuoted.Atom -> Atom(last.value.value)
-                                        is FElementQuoted.Keyword -> Keyword(last.value.value)
-                                        is FElementQuoted.Literal -> Literal(last.value.value)
-                                        is FElementQuoted.Quote ->
-                                            FElementQuoted.Quote(Quote(last.value))
-                                    }
-                            }
-                        )
+                    buffer[buffer.lastIndex] = FElement.Quote(last)
                     return Result.success(res)
                 }
             }
