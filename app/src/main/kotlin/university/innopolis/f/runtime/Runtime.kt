@@ -99,7 +99,6 @@ fun evaluateElementTo(
                     yield(Result.failure(FRuntimeException.NotAFunction()))
                     return@sequence
                 }
-
                 val args = mutableListOf<FValue>()
                 for (result in evaluateListTo(args, funCall.args, context)) {
                     yield(result)
@@ -107,7 +106,6 @@ fun evaluateElementTo(
                         return@sequence
                     }
                 }
-
                 for (result in function.value.call(target, args, context)) {
                     yield(result)
                     if (result.isFailure) {

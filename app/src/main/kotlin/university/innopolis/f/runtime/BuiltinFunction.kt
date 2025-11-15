@@ -24,6 +24,9 @@ fun plus(
                 Pair(lhsRaw.value.value, rhsRaw.value.value)
             }
             else -> {
+                println("We are not here")
+                println(lhsRaw.javaClass)
+                println(rhsRaw.javaClass)
                 yield(Result.failure(FRuntimeException.TypeError()))
                 return@sequence
             }
@@ -46,6 +49,9 @@ fun plus(
                         FLiteral.Real(FReal(lhs.inner.inner + rhs.inner.inner))
                     }
                     else -> {
+                        println("We are here")
+                        println(lhs.javaClass)
+                        println(rhs.javaClass)
                         yield(Result.failure(FRuntimeException.TypeError()))
                         return@sequence
                     }
