@@ -98,7 +98,12 @@ fun evaluateElementTo(
                         return@sequence
                     }
                 if (specialForm != null) {
-                    specialForm.evaluateTo(target, context)
+                    for (result in specialForm.evaluateTo(target, context)) {
+                        yield(result)
+                        if (result.isFailure) {
+                            return@sequence
+                        }
+                    }
                     println("+ Context after Setq: ${context.locals}")
                     return@sequence
                 }
