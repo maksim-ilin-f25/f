@@ -101,11 +101,11 @@ value class FListAst(val elements: MutableList<FElement>) {
                 }
 
                 is FToken.Literal -> {
-                    buffer.add(FElement.Quote(FElement.Literal(currentToken.value)))
+                    buffer.add(FElement.Literal(currentToken.value))
                 }
 
                 is FToken.Keyword -> {
-                    buffer.add(FElement.Quote(FElement.Keyword(currentToken.value)))
+                    buffer.add(FElement.Keyword(currentToken.value))
                 }
 
                 is FToken.Quote -> {
