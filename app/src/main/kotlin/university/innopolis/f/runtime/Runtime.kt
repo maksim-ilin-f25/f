@@ -68,9 +68,17 @@ fun evaluateElementTo(
     element: FElement,
     context: FContext,
 ): Sequence<Result<FValue>> = sequence {
+    println("Processing element: $element (${element.javaClass})")
+
     target.value =
         when (element) {
-            is FElement.Literal -> FValue.Quote(FElement.Quote(element))
+            is FElement.Literal -> {
+                println("- the type is: Literal")
+                println("- inner value: ${element.value} (${element.value.javaClass})")
+                val tmp = FValue.Quote(element)
+                println("- returning: $tmp (${tmp.javaClass})")
+                tmp
+            }
             is FElement.Keyword -> {
                 yield(Result.failure(FRuntimeException.StandaloneKeyword()))
                 return@sequence
@@ -83,8 +91,16 @@ fun evaluateElementTo(
                 }
                 value
             }
-            is FElement.Quote -> FValue.Quote(element.value)
+            is FElement.Quote -> {
+                println("- the type is: Quote")
+                println("- inner value: ${element.value} (${element.value.javaClass})")
+                val tmp = FValue.Quote(element.value)
+                println("- returning: $tmp (${tmp.javaClass})")
+                tmp
+            }
             is FElement.List -> {
+                println("- The type is: List")
+                println("- inner value: ${element.value} (${element.value.javaClass})")
                 val funCall = element.value.toFunCallOrNull()
                 if (funCall == null) {
                     yield(Result.failure(FRuntimeException.MalformedFunCall()))
@@ -112,6 +128,8 @@ fun evaluateElementTo(
                         return@sequence
                     }
                 }
+                val tmp = target.value!!
+                println("- returning: $tmp (${tmp.javaClass})")
                 return@sequence
             }
         }
