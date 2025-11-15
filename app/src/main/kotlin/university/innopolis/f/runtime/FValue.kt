@@ -5,13 +5,11 @@ import university.innopolis.f.grammar.FElement
 sealed class FValue() {
     data class Quote(val value: FElement) : FValue() {
         override fun toString(): String {
-            val initial = "'${value}"
-            return if (
-                initial.startsWith("'") && !(initial.startsWith("''") || initial.startsWith("'("))
-            ) {
-                initial.substring(1)
-            } else {
+            val initial = value.toString()
+            return if (!initial.startsWith("'") && !initial.startsWith("(")) {
                 initial
+            } else {
+                "'$initial"
             }
         }
     }
