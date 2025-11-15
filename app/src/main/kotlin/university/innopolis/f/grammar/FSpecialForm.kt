@@ -36,7 +36,6 @@ sealed class FSpecialForm {
                 }
             }
             context.set(name, evaluated.value!!)
-            target.value = FValue.Quote(FElement.Literal(FLiteral.Null))
         }
 
         companion object {

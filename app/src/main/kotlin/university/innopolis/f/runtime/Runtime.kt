@@ -40,7 +40,9 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
                     break@outer
                 }
             }
-            yield(Result.success(evaluatedValue.value!!.toString()))
+            if (evaluatedValue.value != null) {
+                yield(Result.success(evaluatedValue.value.toString()))
+            }
         }
     }
 }
