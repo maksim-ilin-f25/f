@@ -158,8 +158,48 @@ sealed class FSpecialForm {
         override fun evaluateTo(
             target: Wrapper<FValue?>,
             context: FContext,
-        ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+        ): Sequence<Result<FValue>> = sequence {
+            val conditionValue = Wrapper<FValue?>(null)
+            for (result in evaluateElementTo(conditionValue, condition, context)) {
+                yield(result)
+                if (result.isFailure) {
+                    return@sequence
+                }
+            }
+            val condVal =
+                if (conditionValue.value == null) {
+                    yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
+                    return@sequence
+                } else {
+                    if (conditionValue.value is FValue.Quote) {
+                        val x = conditionValue.value!! as FValue.Quote
+                        if (x.value is FElement.Literal && x.value.value is FLiteral.Boolean) {
+                            x.value.value.inner
+                        } else {
+                            yield(Result.failure(FRuntimeException.TypeError()))
+                            return@sequence
+                        }
+                    } else {
+                        yield(Result.failure(FRuntimeException.TypeError()))
+                        return@sequence
+                    }
+                }
+
+            for (result in
+                evaluateElementTo(
+                    target,
+                    if (condVal.inner) {
+                        thenBody
+                    } else {
+                        elseBody
+                    },
+                    context,
+                )) {
+                yield(result)
+                if (result.isFailure) {
+                    return@sequence
+                }
+            }
         }
 
         companion object {
