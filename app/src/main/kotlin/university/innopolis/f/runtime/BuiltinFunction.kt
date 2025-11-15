@@ -238,7 +238,7 @@ fun head(
                 is FElement.Atom -> headElement
                 is FElement.Keyword -> headElement
                 is FElement.List -> headElement
-                is FElement.Quote -> headElement.value
+                is FElement.Quote -> headElement.value // SUS: check if inner is literal or whatever
             }
         )
 }
