@@ -39,6 +39,7 @@ sealed class FSpecialForm {
                 yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
                 return@sequence
             }
+            context.set(name, evaluated.value!!)
         }
 
         companion object {
