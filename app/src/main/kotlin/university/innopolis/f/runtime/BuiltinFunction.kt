@@ -231,5 +231,14 @@ fun head(
         return@sequence
     }
 
-    target.value = FValue.Quote(headElement)
+    target.value =
+        FValue.Quote(
+            when (headElement) {
+                is FElement.Literal -> headElement
+                is FElement.Atom -> headElement
+                is FElement.Keyword -> headElement
+                is FElement.List -> headElement
+                is FElement.Quote -> headElement.value
+            }
+        )
 }
