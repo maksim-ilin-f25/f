@@ -104,7 +104,6 @@ fun evaluateElementTo(
                             return@sequence
                         }
                     }
-                    println("+ Context after Setq: ${context.locals}")
                     return@sequence
                 }
 

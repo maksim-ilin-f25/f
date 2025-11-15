@@ -28,7 +28,6 @@ sealed class FSpecialForm {
             target: Wrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> = sequence {
-            println("Setq, context: ${context.locals}")
             val evaluated = Wrapper<FValue?>(null)
             for (result in evaluateElementTo(evaluated, value, context)) {
                 yield(result)
@@ -40,9 +39,6 @@ sealed class FSpecialForm {
                 yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
                 return@sequence
             }
-            println("- Writing ${evaluated.value} to $name")
-            context.set(name, evaluated.value!!)
-            println("- Context after writing: ${context.locals}")
         }
 
         companion object {
