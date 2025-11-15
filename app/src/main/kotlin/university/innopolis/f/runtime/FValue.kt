@@ -4,7 +4,7 @@ import university.innopolis.f.grammar.FElement
 
 sealed class FValue() {
     data class Quote(val value: FElement) : FValue() {
-        override fun toString() = "'${value.toString()}"
+        override fun toString() = "'${value}"
     }
 
     data class Function(val value: FFunction) : FValue() {
