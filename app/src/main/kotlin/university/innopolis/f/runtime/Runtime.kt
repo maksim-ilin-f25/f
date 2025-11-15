@@ -2,6 +2,7 @@ package university.innopolis.f.runtime
 
 import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
+import university.innopolis.f.grammar.FSpecialForm
 
 fun runF(ast: List<FElement>): Sequence<Result<String>> {
     val rootContext = FContext(parent = null)
@@ -85,6 +86,16 @@ fun evaluateElementTo(
             }
             is FElement.Quote -> FValue.Quote(element.value)
             is FElement.List -> {
+                val specialForm =
+                    FSpecialForm.from(element.value).getOrElse {
+                        yield(Result.failure(it))
+                        return@sequence
+                    }
+                if (specialForm != null) {
+                    specialForm.evaluateTo(target, context)
+                    return@sequence
+                }
+
                 val funCall = element.value.toFunCallOrNull()
                 if (funCall == null) {
                     yield(Result.failure(FRuntimeException.MalformedFunCall()))
