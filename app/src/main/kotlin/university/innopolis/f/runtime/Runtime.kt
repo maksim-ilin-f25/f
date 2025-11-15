@@ -99,6 +99,7 @@ fun evaluateElementTo(
                     }
                 if (specialForm != null) {
                     specialForm.evaluateTo(target, context)
+                    println("+ Context after Setq: ${context.locals}")
                     return@sequence
                 }
 
