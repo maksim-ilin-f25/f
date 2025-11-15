@@ -70,7 +70,7 @@ fun evaluateElementTo(
 ): Sequence<Result<FValue>> = sequence {
     target.value =
         when (element) {
-            is FElement.Literal -> FValue.Quote(element)
+            is FElement.Literal -> FValue.Quote(FElement.Quote(element))
             is FElement.Keyword -> {
                 yield(Result.failure(FRuntimeException.StandaloneKeyword()))
                 return@sequence

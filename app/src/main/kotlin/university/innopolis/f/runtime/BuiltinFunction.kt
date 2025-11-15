@@ -18,10 +18,12 @@ fun plus(
     val (lhs, rhs) =
         when {
             lhsRaw is FValue.Quote &&
-                lhsRaw.value is FElement.Literal &&
+                lhsRaw.value is FElement.Quote &&
+                lhsRaw.value.value is FElement.Literal &&
                 rhsRaw is FValue.Quote &&
-                rhsRaw.value is FElement.Literal -> {
-                Pair(lhsRaw.value.value, rhsRaw.value.value)
+                rhsRaw.value is FElement.Quote &&
+                rhsRaw.value.value is FElement.Literal -> {
+                Pair(lhsRaw.value.value.value, rhsRaw.value.value.value)
             }
             else -> {
                 println("We are here")
