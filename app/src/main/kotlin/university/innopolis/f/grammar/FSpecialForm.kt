@@ -10,7 +10,8 @@ sealed class FSpecialForm {
             target: Wrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+            target.value = FValue.Quote(value)
+            return emptySequence()
         }
 
         companion object {
