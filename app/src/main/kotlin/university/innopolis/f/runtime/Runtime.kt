@@ -31,6 +31,10 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
         FValue.Function(FFunction.Builtin { target, args, context -> head(target, args, context) }),
     )
     rootContext.set(
+        FAtom("tail"),
+        FValue.Function(FFunction.Builtin { target, args, context -> tail(target, args, context) }),
+    )
+    rootContext.set(
         FAtom("equal"),
         FValue.Function(FFunction.Builtin { target, args, context -> equal(target, args, context) }),
     )
