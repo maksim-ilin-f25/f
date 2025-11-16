@@ -20,18 +20,26 @@ sealed class FFunction {
         }
     }
 
-    class UserDefined(
-        val target: Wrapper<FValue?>,
-        val name: FAtom?,
-        val params: List<FAtom>,
-        val body: FElement,
-    ) : FFunction() {
+    class UserDefined(val name: FAtom?, val params: List<FAtom>, val body: FElement) : FFunction() {
         override fun call(
             target: Wrapper<FValue?>,
             args: List<FValue>,
             parentContext: FContext,
-        ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+        ): Sequence<Result<FValue>> = sequence {
+            if (args.size != params.size) {
+                yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
+                return@sequence
+            }
+            val context = FContext(parentContext)
+            for ((name, value) in params.zip(args)) {
+                context.set(name, value)
+            }
+            for (result in evaluateElementTo(target, body, context)) {
+                yield(result)
+                if (result.isFailure) {
+                    return@sequence
+                }
+            }
         }
     }
 

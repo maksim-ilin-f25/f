@@ -62,7 +62,11 @@ sealed class FSpecialForm {
             target: Wrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+            context.set(
+                name,
+                FValue.Function(FFunction.UserDefined(name = name, params = params, body = body)),
+            )
+            return emptySequence()
         }
 
         companion object {
@@ -95,9 +99,11 @@ sealed class FSpecialForm {
     class Lambda(val params: List<FAtom>, val body: FElement) : FSpecialForm() {
         override fun evaluateTo(
             target: Wrapper<FValue?>,
-            context: FContext,
+            _context: FContext,
         ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+            target.value =
+                FValue.Function(FFunction.UserDefined(name = null, params = params, body = body))
+            return emptySequence()
         }
 
         companion object {
