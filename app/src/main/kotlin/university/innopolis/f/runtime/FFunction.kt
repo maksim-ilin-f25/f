@@ -30,19 +30,25 @@ sealed class FFunction {
             target: TargetWrapper<FValue?>,
             args: List<FValue>,
             parentContext: FContext,
-        ): Sequence<Result<FValue>> = sequence {
-            if (args.size != params.size) {
-                yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
-                return@sequence
-            }
-            val context = FContext(parentContext)
-            for ((name, value) in params.zip(args)) {
-                context.set(name, value)
-            }
-            for (result in evaluateElementTo(target, body, context)) {
-                yield(result)
-                if (result.isFailure) {
+        ): Sequence<Result<FValue>> {
+            val self = this
+            return sequence {
+                if (args.size != params.size) {
+                    yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
                     return@sequence
+                }
+                val context = FContext(parentContext)
+                if (name != null) {
+                    context.set(name, FValue.Function(self))
+                }
+                for ((name, value) in params.zip(args)) {
+                    context.set(name, value)
+                }
+                for (result in evaluateElementTo(target, body, context)) {
+                    yield(result)
+                    if (result.isFailure) {
+                        return@sequence
+                    }
                 }
             }
         }
