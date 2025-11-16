@@ -3,6 +3,11 @@ package university.innopolis.f.runtime
 import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
 import university.innopolis.f.grammar.FSpecialForm
+import university.innopolis.f.runtime.builtin.divide
+import university.innopolis.f.runtime.builtin.head
+import university.innopolis.f.runtime.builtin.minus
+import university.innopolis.f.runtime.builtin.plus
+import university.innopolis.f.runtime.builtin.times
 
 fun runF(ast: List<FElement>): Sequence<Result<String>> {
     val rootContext = FContext(parent = null)
