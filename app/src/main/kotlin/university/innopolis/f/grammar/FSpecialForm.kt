@@ -223,8 +223,54 @@ sealed class FSpecialForm {
         override fun evaluateTo(
             target: Wrapper<FValue?>,
             context: FContext,
-        ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+        ): Sequence<Result<FValue>> = sequence {
+            while (true) {
+                val conditionValue = Wrapper<FValue?>(null)
+                for (result in evaluateElementTo(conditionValue, condition, context)) {
+                    yield(result)
+                    if (result.isFailure) {
+                        return@sequence
+                    }
+                }
+                val condVal =
+                    evaluateAsBoolean(conditionValue.value).getOrElse {
+                        yield(Result.failure(it))
+                        return@sequence
+                    }
+                if (!condVal.inner) {
+                    break
+                }
+                val innerTarget = Wrapper<FValue?>(null)
+                for (result in evaluateElementTo(innerTarget, body, context)) {
+                    yield(result)
+                    if (result.isFailure) {
+                        return@sequence
+                    }
+                }
+                if (innerTarget.value != null) {
+                    yield(Result.success(innerTarget.value!!))
+                }
+            }
+            target.value = FValue.Quote(FElement.Literal(FLiteral.Null))
+        }
+
+        private fun evaluateAsBoolean(conditionValue: FValue?): Result<FBoolean> {
+            return if (conditionValue == null) {
+                Result.failure(FRuntimeException.UseOfNonexistentValue())
+            } else {
+                if (conditionValue is FValue.Quote) {
+                    if (
+                        conditionValue.value is FElement.Literal &&
+                            conditionValue.value.value is FLiteral.Boolean
+                    ) {
+                        Result.success(conditionValue.value.value.inner)
+                    } else {
+                        Result.failure(FRuntimeException.TypeError())
+                    }
+                } else {
+                    Result.failure(FRuntimeException.TypeError())
+                }
+            }
         }
 
         companion object {
