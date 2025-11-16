@@ -18,6 +18,6 @@ sealed class FElement {
     }
 
     data class Keyword(val value: FKeyword) : FElement() {
-        override fun toString() = value.name
+        override fun toString() = value.toString()
     }
 }
