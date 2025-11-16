@@ -3,11 +3,7 @@ package university.innopolis.f.runtime
 import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
 import university.innopolis.f.grammar.FSpecialForm
-import university.innopolis.f.runtime.builtin.divide
-import university.innopolis.f.runtime.builtin.head
-import university.innopolis.f.runtime.builtin.minus
-import university.innopolis.f.runtime.builtin.plus
-import university.innopolis.f.runtime.builtin.times
+import university.innopolis.f.runtime.builtin.*
 
 fun runF(ast: List<FElement>): Sequence<Result<String>> {
     val rootContext = FContext(parent = null)
@@ -38,7 +34,7 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
     val context = FContext(parent = rootContext)
     return sequence {
         outer@ for (element in ast) {
-            val evaluatedValue = Wrapper<FValue?>(null)
+            val evaluatedValue = TargetWrapper<FValue?>(null)
             for (result in evaluateElementTo(evaluatedValue, element, context)) {
                 yield(result.map { it.toString() })
                 if (result.isFailure) {
@@ -58,7 +54,7 @@ fun evaluateListTo(
     context: FContext,
 ): Sequence<Result<FValue>> = sequence {
     for (outputSequence in ast) {
-        val element: Wrapper<FValue?> = Wrapper(null)
+        val element: TargetWrapper<FValue?> = TargetWrapper(null)
         for (result in evaluateElementTo(element, outputSequence, context)) {
             yield(result)
             if (result.isFailure) {
@@ -73,10 +69,10 @@ fun evaluateListTo(
     }
 }
 
-class Wrapper<T>(var value: T)
+class TargetWrapper<T>(var value: T)
 
 fun evaluateElementTo(
-    target: Wrapper<FValue?>,
+    target: TargetWrapper<FValue?>,
     element: FElement,
     context: FContext,
 ): Sequence<Result<FValue>> = sequence {

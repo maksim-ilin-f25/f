@@ -4,10 +4,11 @@ import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
 
 sealed class FFunction {
-    class Builtin(val fn: (Wrapper<FValue?>, List<FValue>, FContext) -> Sequence<Result<FValue>>) :
-        FFunction() {
+    class Builtin(
+        val fn: (TargetWrapper<FValue?>, List<FValue>, FContext) -> Sequence<Result<FValue>>
+    ) : FFunction() {
         override fun call(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             args: List<FValue>,
             parentContext: FContext,
         ): Sequence<Result<FValue>> = sequence {
@@ -22,7 +23,7 @@ sealed class FFunction {
 
     class UserDefined(val name: FAtom?, val params: List<FAtom>, val body: FElement) : FFunction() {
         override fun call(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             args: List<FValue>,
             parentContext: FContext,
         ): Sequence<Result<FValue>> = sequence {
@@ -44,7 +45,7 @@ sealed class FFunction {
     }
 
     abstract fun call(
-        target: Wrapper<FValue?>,
+        target: TargetWrapper<FValue?>,
         args: List<FValue>,
         parentContext: FContext,
     ): Sequence<Result<FValue>>

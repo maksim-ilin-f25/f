@@ -3,7 +3,7 @@ package university.innopolis.f.runtime
 import university.innopolis.f.grammar.FElement
 
 fun setq(
-    target: Wrapper<FValue?>,
+    target: TargetWrapper<FValue?>,
     args: List<FElement>,
     context: FContext,
 ): Sequence<Result<FValue>> = sequence {
@@ -22,7 +22,7 @@ fun setq(
             }
         }
 
-    val evaluated = Wrapper<FValue?>(null)
+    val evaluated = TargetWrapper<FValue?>(null)
     for (result in evaluateElementTo(evaluated, rhs, context)) {
         yield(result)
         if (result.isFailure) {

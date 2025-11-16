@@ -3,11 +3,14 @@ package university.innopolis.f.grammar
 import university.innopolis.f.runtime.*
 
 sealed class FSpecialForm {
-    abstract fun evaluateTo(target: Wrapper<FValue?>, context: FContext): Sequence<Result<FValue>>
+    abstract fun evaluateTo(
+        target: TargetWrapper<FValue?>,
+        context: FContext,
+    ): Sequence<Result<FValue>>
 
     class Quote(val value: FElement) : FSpecialForm() {
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> {
             target.value = FValue.Quote(value)
@@ -26,10 +29,10 @@ sealed class FSpecialForm {
 
     class Setq(val name: FAtom, val value: FElement) : FSpecialForm() {
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> = sequence {
-            val evaluated = Wrapper<FValue?>(null)
+            val evaluated = TargetWrapper<FValue?>(null)
             for (result in evaluateElementTo(evaluated, value, context)) {
                 yield(result)
                 if (result.isFailure) {
@@ -59,7 +62,7 @@ sealed class FSpecialForm {
 
     class Func(val name: FAtom, val params: List<FAtom>, val body: FElement) : FSpecialForm() {
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> {
             context.set(
@@ -98,7 +101,7 @@ sealed class FSpecialForm {
 
     class Lambda(val params: List<FAtom>, val body: FElement) : FSpecialForm() {
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             _context: FContext,
         ): Sequence<Result<FValue>> {
             target.value =
@@ -127,13 +130,57 @@ sealed class FSpecialForm {
         }
     }
 
-    class Prog(val localContext: List<Pair<FAtom, FElement>>, val body: List<FElement>) :
+    class Prog(val bindings: List<Pair<FAtom, FElement>>, val body: List<FElement>) :
         FSpecialForm() {
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             context: FContext,
-        ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+        ): Sequence<Result<FValue>> = sequence {
+            val innerContext = FContext(context)
+            for (result in setupInnerContext(innerContext)) {
+                yield(result)
+                if (result.isFailure) {
+                    return@sequence
+                }
+            }
+            for (i in body.indices) {
+                if (i == body.lastIndex) {
+                    break
+                }
+                val innerTarget = TargetWrapper<FValue?>(null)
+                for (result in evaluateElementTo(innerTarget, body[i], innerContext)) {
+                    yield(result)
+                    if (result.isFailure) {
+                        return@sequence
+                    }
+                }
+                if (innerTarget.value != null) {
+                    yield(Result.success(innerTarget.value!!))
+                }
+            }
+            for (result in evaluateElementTo(target, body.last(), innerContext)) {
+                yield(result)
+                if (result.isFailure) {
+                    return@sequence
+                }
+            }
+        }
+
+        fun setupInnerContext(innerContext: FContext): Sequence<Result<FValue>> = sequence {
+            for ((name, rawValue) in bindings) {
+                val bindingTarget = TargetWrapper<FValue?>(null)
+                for (result in evaluateElementTo(bindingTarget, rawValue, innerContext)) {
+                    yield(result)
+                    if (result.isFailure) {
+                        return@sequence
+                    }
+                }
+                if (bindingTarget.value == null) {
+                    yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
+                    return@sequence
+                }
+                innerContext.set(name, bindingTarget.value!!)
+            }
         }
 
         companion object {
@@ -154,7 +201,7 @@ sealed class FSpecialForm {
                     return Result.failure(FRuntimeException.InvalidArgForm())
                 }
                 val argBody = args.subList(1, args.size)
-                return Result.success(Prog(localContext = argLocalContext, body = argBody))
+                return Result.success(Prog(bindings = argLocalContext, body = argBody))
             }
         }
     }
@@ -162,10 +209,10 @@ sealed class FSpecialForm {
     class Cond(val condition: FElement, val thenBody: FElement, val elseBody: FElement) :
         FSpecialForm() {
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> = sequence {
-            val conditionValue = Wrapper<FValue?>(null)
+            val conditionValue = TargetWrapper<FValue?>(null)
             for (result in evaluateElementTo(conditionValue, condition, context)) {
                 yield(result)
                 if (result.isFailure) {
@@ -227,11 +274,11 @@ sealed class FSpecialForm {
 
     class While(val condition: FElement, val body: FElement) : FSpecialForm() {
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> = sequence {
             while (true) {
-                val conditionValue = Wrapper<FValue?>(null)
+                val conditionValue = TargetWrapper<FValue?>(null)
                 for (result in evaluateElementTo(conditionValue, condition, context)) {
                     yield(result)
                     if (result.isFailure) {
@@ -246,7 +293,7 @@ sealed class FSpecialForm {
                 if (!condVal.inner) {
                     break
                 }
-                val innerTarget = Wrapper<FValue?>(null)
+                val innerTarget = TargetWrapper<FValue?>(null)
                 for (result in evaluateElementTo(innerTarget, body, context)) {
                     yield(result)
                     if (result.isFailure) {
@@ -293,7 +340,7 @@ sealed class FSpecialForm {
 
     class Return(val value: FElement) : FSpecialForm() {
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> {
             TODO("Not yet implemented")
@@ -318,7 +365,7 @@ sealed class FSpecialForm {
         }
 
         override fun evaluateTo(
-            target: Wrapper<FValue?>,
+            target: TargetWrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> {
             TODO("Not yet implemented")

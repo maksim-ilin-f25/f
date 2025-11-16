@@ -4,10 +4,10 @@ import university.innopolis.f.grammar.FElement
 import university.innopolis.f.runtime.FContext
 import university.innopolis.f.runtime.FRuntimeException
 import university.innopolis.f.runtime.FValue
-import university.innopolis.f.runtime.Wrapper
+import university.innopolis.f.runtime.TargetWrapper
 
 fun head(
-    target: Wrapper<FValue?>,
+    target: TargetWrapper<FValue?>,
     args: List<FValue>,
     _context: FContext,
 ): Sequence<Result<FValue>> = sequence {

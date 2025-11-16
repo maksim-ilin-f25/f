@@ -7,10 +7,10 @@ import university.innopolis.f.grammar.FReal
 import university.innopolis.f.runtime.FContext
 import university.innopolis.f.runtime.FRuntimeException
 import university.innopolis.f.runtime.FValue
-import university.innopolis.f.runtime.Wrapper
+import university.innopolis.f.runtime.TargetWrapper
 
 fun plus(
-    target: Wrapper<FValue?>,
+    target: TargetWrapper<FValue?>,
     args: List<FValue>,
     _context: FContext,
 ): Sequence<Result<FValue>> = sequence {
@@ -59,7 +59,7 @@ fun plus(
 }
 
 fun minus(
-    target: Wrapper<FValue?>,
+    target: TargetWrapper<FValue?>,
     args: List<FValue>,
     _context: FContext,
 ): Sequence<Result<FValue>> = sequence {
@@ -108,7 +108,7 @@ fun minus(
 }
 
 fun times(
-    target: Wrapper<FValue?>,
+    target: TargetWrapper<FValue?>,
     args: List<FValue>,
     _context: FContext,
 ): Sequence<Result<FValue>> = sequence {
@@ -157,7 +157,7 @@ fun times(
 }
 
 fun divide(
-    target: Wrapper<FValue?>,
+    target: TargetWrapper<FValue?>,
     args: List<FValue>,
     _context: FContext,
 ): Sequence<Result<FValue>> = sequence {
