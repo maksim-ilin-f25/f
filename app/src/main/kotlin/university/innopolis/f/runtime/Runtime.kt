@@ -63,6 +63,40 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
         ),
     )
     rootContext.set(
+        FAtom("isint"),
+        FValue.Function(FFunction.Builtin { target, args, context -> isint(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("isreal"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> isreal(target, args, context) }
+        ),
+    )
+    rootContext.set(
+        FAtom("isbool"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> isbool(target, args, context) }
+        ),
+    )
+    rootContext.set(
+        FAtom("isnull"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> isnull(target, args, context) }
+        ),
+    )
+    rootContext.set(
+        FAtom("isatom"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> isatom(target, args, context) }
+        ),
+    )
+    rootContext.set(
+        FAtom("islist"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> islist(target, args, context) }
+        ),
+    )
+    rootContext.set(
         FAtom("eval"),
         FValue.Function(FFunction.Builtin { target, args, context -> eval(target, args, context) }),
     )
