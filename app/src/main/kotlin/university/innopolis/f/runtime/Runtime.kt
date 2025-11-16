@@ -31,6 +31,38 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
         FValue.Function(FFunction.Builtin { target, args, context -> head(target, args, context) }),
     )
     rootContext.set(
+        FAtom("equal"),
+        FValue.Function(FFunction.Builtin { target, args, context -> equal(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("nonequal"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> nonequal(target, args, context) }
+        ),
+    )
+    rootContext.set(
+        FAtom("less"),
+        FValue.Function(FFunction.Builtin { target, args, context -> less(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("lesseq"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> lesseq(target, args, context) }
+        ),
+    )
+    rootContext.set(
+        FAtom("greater"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> greater(target, args, context) }
+        ),
+    )
+    rootContext.set(
+        FAtom("greatereq"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> greatereq(target, args, context) }
+        ),
+    )
+    rootContext.set(
         FAtom("eval"),
         FValue.Function(FFunction.Builtin { target, args, context -> eval(target, args, context) }),
     )
