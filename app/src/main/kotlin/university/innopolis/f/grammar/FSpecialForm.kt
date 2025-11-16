@@ -167,37 +167,39 @@ sealed class FSpecialForm {
                 }
             }
             val condVal =
-                if (conditionValue.value == null) {
-                    yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
+                evaluateAsBoolean(conditionValue.value).getOrElse {
+                    yield(Result.failure(it))
                     return@sequence
-                } else {
-                    if (conditionValue.value is FValue.Quote) {
-                        val x = conditionValue.value!! as FValue.Quote
-                        if (x.value is FElement.Literal && x.value.value is FLiteral.Boolean) {
-                            x.value.value.inner
-                        } else {
-                            yield(Result.failure(FRuntimeException.TypeError()))
-                            return@sequence
-                        }
-                    } else {
-                        yield(Result.failure(FRuntimeException.TypeError()))
-                        return@sequence
-                    }
                 }
-
-            for (result in
-                evaluateElementTo(
-                    target,
-                    if (condVal.inner) {
-                        thenBody
-                    } else {
-                        elseBody
-                    },
-                    context,
-                )) {
+            val evalBody =
+                if (condVal.inner) {
+                    thenBody
+                } else {
+                    elseBody
+                }
+            for (result in evaluateElementTo(target, evalBody, context)) {
                 yield(result)
                 if (result.isFailure) {
                     return@sequence
+                }
+            }
+        }
+
+        private fun evaluateAsBoolean(conditionValue: FValue?): Result<FBoolean> {
+            return if (conditionValue == null) {
+                Result.failure(FRuntimeException.UseOfNonexistentValue())
+            } else {
+                if (conditionValue is FValue.Quote) {
+                    if (
+                        conditionValue.value is FElement.Literal &&
+                            conditionValue.value.value is FLiteral.Boolean
+                    ) {
+                        Result.success(conditionValue.value.value.inner)
+                    } else {
+                        Result.failure(FRuntimeException.TypeError())
+                    }
+                } else {
+                    Result.failure(FRuntimeException.TypeError())
                 }
             }
         }
