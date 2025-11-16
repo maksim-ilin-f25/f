@@ -97,6 +97,22 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
         ),
     )
     rootContext.set(
+        FAtom("and"),
+        FValue.Function(FFunction.Builtin { target, args, context -> and(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("or"),
+        FValue.Function(FFunction.Builtin { target, args, context -> or(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("xor"),
+        FValue.Function(FFunction.Builtin { target, args, context -> xor(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("not"),
+        FValue.Function(FFunction.Builtin { target, args, context -> not(target, args, context) }),
+    )
+    rootContext.set(
         FAtom("eval"),
         FValue.Function(FFunction.Builtin { target, args, context -> eval(target, args, context) }),
     )
