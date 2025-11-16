@@ -16,7 +16,7 @@ sealed class FValue() {
 
     data class Function(val value: FFunction) : FValue() {
         override fun toString(): String {
-            TODO()
+            return value.toString()
         }
     }
 }

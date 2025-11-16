@@ -19,6 +19,10 @@ sealed class FFunction {
                 }
             }
         }
+
+        override fun toString(): String {
+            return "[Builtin Function]"
+        }
     }
 
     class UserDefined(val name: FAtom?, val params: List<FAtom>, val body: FElement) : FFunction() {
@@ -40,6 +44,14 @@ sealed class FFunction {
                 if (result.isFailure) {
                     return@sequence
                 }
+            }
+        }
+
+        override fun toString(): String {
+            return if (name != null) {
+                "[Function ${name}]"
+            } else {
+                "[Anonymous Function]"
             }
         }
     }

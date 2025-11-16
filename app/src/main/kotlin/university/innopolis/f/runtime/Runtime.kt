@@ -30,6 +30,10 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
         FAtom("head"),
         FValue.Function(FFunction.Builtin { target, args, context -> head(target, args, context) }),
     )
+    rootContext.set(
+        FAtom("eval"),
+        FValue.Function(FFunction.Builtin { target, args, context -> eval(target, args, context) }),
+    )
 
     val context = FContext(parent = rootContext)
     return sequence {
