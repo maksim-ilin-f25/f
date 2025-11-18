@@ -30,15 +30,14 @@ fun head(
     }
 
     target.value =
-        FValue.Quote(
-            when (headElement) {
-                is FElement.Literal -> headElement
-                is FElement.Atom -> headElement
-                is FElement.Keyword -> headElement
-                is FElement.List -> headElement
-                is FElement.Quote -> headElement.value // SUS: check if inner is literal or whatever
-            }
-        )
+        when (headElement) {
+            is FElement.Literal -> FValue.Quote(headElement)
+            is FElement.Atom -> FValue.Quote(headElement)
+            is FElement.Keyword -> FValue.Quote(headElement)
+            is FElement.List -> FValue.Quote(headElement)
+            is FElement.Quote -> FValue.Quote(headElement.value)
+            is FElement.Function -> FValue.Function(headElement.value)
+        }
 }
 
 fun tail(
@@ -65,4 +64,34 @@ fun tail(
     val tailElements = quote.value.value.elements.subList(1, quote.value.value.elements.size)
 
     target.value = FValue.Quote(FElement.List(FListAst(tailElements)))
+}
+
+fun cons(
+    target: TargetWrapper<FValue?>,
+    args: List<FValue>,
+    _context: FContext,
+): Sequence<Result<FValue>> = sequence {
+    if (args.size != 2) {
+        yield(Result.failure(FRuntimeException.InvalidNumOfArgs()))
+        return@sequence
+    }
+
+    val (insertingItem, list) = args
+    if (list !is FValue.Quote || list.value !is FElement.List) {
+        yield(Result.failure(FRuntimeException.TypeError()))
+        return@sequence
+    }
+
+    val itemAsElement =
+        when (insertingItem) {
+            is FValue.Function -> FElement.Function(insertingItem.value)
+            is FValue.Quote -> insertingItem.value
+        }
+
+    target.value =
+        FValue.Quote(
+            FElement.List(
+                FListAst(mutableListOf(itemAsElement, *list.value.value.elements.toTypedArray()))
+            )
+        )
 }

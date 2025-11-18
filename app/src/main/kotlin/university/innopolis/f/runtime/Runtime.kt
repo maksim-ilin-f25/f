@@ -3,6 +3,8 @@ package university.innopolis.f.runtime
 import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
 import university.innopolis.f.grammar.FSpecialForm
+import university.innopolis.f.runtime.FRuntimeException.*
+import university.innopolis.f.runtime.FValue.Quote
 import university.innopolis.f.runtime.builtin.*
 
 fun runF(ast: List<FElement>): Sequence<Result<String>> {
@@ -33,6 +35,10 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
     rootContext.set(
         FAtom("tail"),
         FValue.Function(FFunction.Builtin { target, args, context -> tail(target, args, context) }),
+    )
+    rootContext.set(
+        FAtom("cons"),
+        FValue.Function(FFunction.Builtin { target, args, context -> cons(target, args, context) }),
     )
     rootContext.set(
         FAtom("equal"),
@@ -168,20 +174,20 @@ fun evaluateElementTo(
 ): Sequence<Result<FValue>> = sequence {
     target.value =
         when (element) {
-            is FElement.Literal -> FValue.Quote(element)
+            is FElement.Literal -> Quote(element)
             is FElement.Keyword -> {
-                yield(Result.failure(FRuntimeException.StandaloneKeyword()))
+                yield(Result.failure(StandaloneKeyword()))
                 return@sequence
             }
             is FElement.Atom -> {
                 val value = context.valueOf(element.value)
                 if (value == null) {
-                    yield(Result.failure(FRuntimeException.UnboundAtom()))
+                    yield(Result.failure(UnboundAtom()))
                     return@sequence
                 }
                 value
             }
-            is FElement.Quote -> FValue.Quote(element.value)
+            is FElement.Quote -> Quote(element.value)
             is FElement.List -> {
                 val specialForm =
                     FSpecialForm.from(element.value).getOrElse {
@@ -200,16 +206,16 @@ fun evaluateElementTo(
 
                 val funCall = element.value.toFunCallOrNull()
                 if (funCall == null) {
-                    yield(Result.failure(FRuntimeException.MalformedFunCall()))
+                    yield(Result.failure(MalformedFunCall()))
                     return@sequence
                 }
                 val function = context.valueOf(funCall.name)
                 if (function == null) {
-                    yield(Result.failure(FRuntimeException.UnboundAtom()))
+                    yield(Result.failure(UnboundAtom()))
                     return@sequence
                 }
                 if (function !is FValue.Function) {
-                    yield(Result.failure(FRuntimeException.NotAFunction()))
+                    yield(Result.failure(NotAFunction()))
                     return@sequence
                 }
                 val args = mutableListOf<FValue>()
@@ -227,5 +233,7 @@ fun evaluateElementTo(
                 }
                 return@sequence
             }
+
+            is FElement.Function -> FValue.Function(element.value)
         }
 }

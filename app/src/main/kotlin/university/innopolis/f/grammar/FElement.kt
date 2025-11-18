@@ -1,5 +1,7 @@
 package university.innopolis.f.grammar
 
+import university.innopolis.f.runtime.FFunction
+
 sealed class FElement {
     data class Atom(val value: FAtom) : FElement() {
         override fun toString() = value.name
@@ -18,6 +20,10 @@ sealed class FElement {
     }
 
     data class Keyword(val value: FKeyword) : FElement() {
+        override fun toString() = value.toString()
+    }
+
+    data class Function(val value: FFunction) : FElement() {
         override fun toString() = value.toString()
     }
 }
