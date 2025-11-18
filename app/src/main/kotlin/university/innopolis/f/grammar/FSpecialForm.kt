@@ -174,12 +174,22 @@ sealed class FSpecialForm {
                     yield(Result.success(innerTarget.value!!))
                 }
             }
-            for (result in evaluateElementTo(target, body.last(), innerContext)) {
+            val innerTarget = TargetWrapper<FValue?>(null)
+            for (result in evaluateElementTo(innerTarget, body.last(), innerContext)) {
                 yield(result)
                 if (result.isFailure) {
                     return@sequence
                 }
             }
+            if (innerTarget.value is FValue.Return) {
+                target.value = (innerTarget.value as FValue.Return).value
+                return@sequence
+            }
+            if (innerTarget.value is FValue.Break) {
+                target.value = FValue.Break
+                return@sequence
+            }
+            target.value = innerTarget.value
         }
 
         fun setupInnerContext(innerContext: FContext): Sequence<Result<FValue>> = sequence {
