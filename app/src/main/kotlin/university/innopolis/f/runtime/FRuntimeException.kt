@@ -45,4 +45,12 @@ sealed class FRuntimeException() : IllegalArgumentException() {
     class DuplicateParamNames() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
+
+    class InvalidBreak() : FRuntimeException() {
+        override fun toString(): String = TODO()
+    }
+
+    class InvalidReturn() : FRuntimeException() {
+        override fun toString(): String = TODO()
+    }
 }

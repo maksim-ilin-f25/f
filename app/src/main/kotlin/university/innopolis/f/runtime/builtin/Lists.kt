@@ -86,6 +86,14 @@ fun cons(
         when (insertingItem) {
             is FValue.Function -> FElement.Function(insertingItem.value)
             is FValue.Quote -> insertingItem.value
+            is FValue.Break -> {
+                target.value = insertingItem
+                return@sequence
+            }
+            is FValue.Return -> {
+                target.value = insertingItem
+                return@sequence
+            }
         }
 
     target.value =

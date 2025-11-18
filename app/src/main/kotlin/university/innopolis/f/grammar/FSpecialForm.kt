@@ -162,6 +162,14 @@ sealed class FSpecialForm {
                         return@sequence
                     }
                 }
+                if (innerTarget.value is FValue.Return) {
+                    target.value = (innerTarget.value as FValue.Return).value
+                    return@sequence
+                }
+                if (innerTarget.value is FValue.Break) {
+                    target.value = FValue.Break
+                    return@sequence
+                }
                 if (innerTarget.value != null) {
                     yield(Result.success(innerTarget.value!!))
                 }
@@ -308,6 +316,14 @@ sealed class FSpecialForm {
                         return@sequence
                     }
                 }
+                if (innerTarget.value is FValue.Break) {
+                    break
+                }
+                if (innerTarget.value is FValue.Return) {
+                    target.value = innerTarget.value
+                    return@sequence
+                }
+
                 if (innerTarget.value != null) {
                     yield(Result.success(innerTarget.value!!))
                 }
@@ -350,8 +366,20 @@ sealed class FSpecialForm {
         override fun evaluateTo(
             target: TargetWrapper<FValue?>,
             context: FContext,
-        ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+        ): Sequence<Result<FValue>> = sequence {
+            val innerTarget = TargetWrapper<FValue?>(null)
+            for (result in evaluateElementTo(innerTarget, value, context)) {
+                yield(result)
+                if (result.isFailure) {
+                    return@sequence
+                }
+            }
+            target.value =
+                when (innerTarget.value) {
+                    is FValue.Break -> FValue.Break
+                    is FValue.Return -> innerTarget.value
+                    else -> FValue.Return(innerTarget.value)
+                }
         }
 
         companion object {
@@ -374,9 +402,10 @@ sealed class FSpecialForm {
 
         override fun evaluateTo(
             target: TargetWrapper<FValue?>,
-            context: FContext,
+            _context: FContext,
         ): Sequence<Result<FValue>> {
-            TODO("Not yet implemented")
+            target.value = FValue.Break
+            return emptySequence()
         }
     }
 

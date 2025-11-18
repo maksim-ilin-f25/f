@@ -44,10 +44,24 @@ sealed class FFunction {
                 for ((name, value) in params.zip(args)) {
                     context.set(name, value)
                 }
-                for (result in evaluateElementTo(target, body, context)) {
+                val bufferTarget = TargetWrapper<FValue?>(null)
+                for (result in evaluateElementTo(bufferTarget, body, context)) {
                     yield(result)
                     if (result.isFailure) {
                         return@sequence
+                    }
+                }
+                when (bufferTarget.value) {
+                    is FValue.Break -> {
+                        yield(Result.failure(FRuntimeException.InvalidBreak()))
+                        return@sequence
+                    }
+                    is FValue.Return -> {
+                        target.value = (bufferTarget.value as FValue.Return).value
+                        return@sequence
+                    }
+                    else -> {
+                        target.value = bufferTarget.value
                     }
                 }
             }

@@ -19,4 +19,8 @@ sealed class FValue() {
             return value.toString()
         }
     }
+
+    data class Return(val value: FValue?) : FValue()
+
+    data object Break : FValue()
 }

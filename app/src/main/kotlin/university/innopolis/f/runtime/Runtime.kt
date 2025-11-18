@@ -137,18 +137,30 @@ fun runF(ast: List<FElement>): Sequence<Result<String>> {
                     break@outer
                 }
             }
-            if (evaluatedValue.value != null) {
-                yield(Result.success(evaluatedValue.value.toString()))
+            when (evaluatedValue.value) {
+                is FValue.Break -> {
+                    yield(Result.failure(FRuntimeException.InvalidBreak()))
+                    break@outer
+                }
+                is FValue.Return -> {
+                    yield(Result.failure(FRuntimeException.InvalidReturn()))
+                    break@outer
+                }
+                null -> {}
+                else -> {
+                    yield(Result.success(evaluatedValue.value.toString()))
+                }
             }
         }
     }
 }
 
 fun evaluateListTo(
-    list: MutableList<FValue>,
+    target: TargetWrapper<EvaluateListResult>,
     ast: List<FElement>,
     context: FContext,
 ): Sequence<Result<FValue>> = sequence {
+    val list = emptyList<FValue>().toMutableList()
     for (outputSequence in ast) {
         val element: TargetWrapper<FValue?> = TargetWrapper(null)
         for (result in evaluateElementTo(element, outputSequence, context)) {
@@ -157,15 +169,40 @@ fun evaluateListTo(
                 return@sequence
             }
         }
+        if (element.value is FValue.Break) {
+            target.value = EvaluateListResult.ControlFlowWrapper(ControlFlow.Break)
+            return@sequence
+        }
+        if (element.value is FValue.Return) {
+            target.value =
+                EvaluateListResult.ControlFlowWrapper(
+                    ControlFlow.Return((element.value as FValue.Return).value)
+                )
+            return@sequence
+        }
+
         if (element.value == null) {
             yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
             return@sequence
         }
         list.add(element.value!!)
     }
+    target.value = EvaluateListResult.ValueWrapper(list)
 }
 
 class TargetWrapper<T>(var value: T)
+
+sealed class ControlFlow {
+    class Return(val value: FValue?) : ControlFlow()
+
+    object Break : ControlFlow()
+}
+
+sealed class EvaluateListResult {
+    class ValueWrapper(val list: MutableList<FValue>) : EvaluateListResult()
+
+    class ControlFlowWrapper(val operation: ControlFlow) : EvaluateListResult()
+}
 
 fun evaluateElementTo(
     target: TargetWrapper<FValue?>,
@@ -218,13 +255,39 @@ fun evaluateElementTo(
                     yield(Result.failure(NotAFunction()))
                     return@sequence
                 }
-                val args = mutableListOf<FValue>()
-                for (result in evaluateListTo(args, funCall.args, context)) {
+                val listTarget =
+                    TargetWrapper<EvaluateListResult>(
+                        EvaluateListResult.ValueWrapper(emptyList<FValue>().toMutableList())
+                    )
+                for (result in evaluateListTo(listTarget, funCall.args, context)) {
                     yield(result)
                     if (result.isFailure) {
                         return@sequence
                     }
                 }
+                val args =
+                    when (listTarget.value) {
+                        is EvaluateListResult.ValueWrapper ->
+                            (listTarget.value as EvaluateListResult.ValueWrapper).list
+                        is EvaluateListResult.ControlFlowWrapper -> {
+
+                            when (
+                                (listTarget.value as EvaluateListResult.ControlFlowWrapper)
+                                    .operation
+                            ) {
+                                is ControlFlow.Break -> {
+                                    target.value = FValue.Break
+                                }
+                                is ControlFlow.Return -> {
+                                    val returnWrapper =
+                                        (listTarget.value as EvaluateListResult.ControlFlowWrapper)
+                                            .operation as ControlFlow.Return
+                                    target.value = FValue.Return(returnWrapper.value)
+                                }
+                            }
+                            return@sequence
+                        }
+                    }
                 for (result in function.value.call(target, args, context)) {
                     yield(result)
                     if (result.isFailure) {

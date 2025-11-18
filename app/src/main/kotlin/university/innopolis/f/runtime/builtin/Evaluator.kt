@@ -12,11 +12,12 @@ fun eval(
         return@sequence
     }
     val body = args.first()
-    when (body) {
-        is FValue.Function -> {
+    when {
+        body is FValue.Function || body is FValue.Break || body is FValue.Return -> {
             target.value = body
+            return@sequence
         }
-        is FValue.Quote -> {
+        body is FValue.Quote -> {
             for (result in evaluateElementTo(target, body.value, context)) {
                 yield(result)
                 if (result.isFailure) {
