@@ -92,6 +92,10 @@ sealed class FSpecialForm {
                 if (argParams == null) {
                     return Result.failure(FRuntimeException.InvalidArgForm())
                 }
+                val names = argParams.map { it.name }.toSet()
+                if (names.size != argParams.size) {
+                    return Result.failure(FRuntimeException.DuplicateParamNames())
+                }
                 return Result.success(
                     Func(name = argName.value, params = argParams, body = argBody)
                 )
@@ -124,6 +128,10 @@ sealed class FSpecialForm {
                         .getOrNull()
                 if (argParams == null) {
                     return Result.failure(FRuntimeException.InvalidArgForm())
+                }
+                val names = argParams.map { it.name }.toSet()
+                if (names.size != argParams.size) {
+                    return Result.failure(FRuntimeException.DuplicateParamNames())
                 }
                 return Result.success(Lambda(params = argParams, body = argBody))
             }

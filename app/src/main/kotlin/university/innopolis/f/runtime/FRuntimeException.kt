@@ -41,4 +41,8 @@ sealed class FRuntimeException() : IllegalArgumentException() {
     class UseOfNonexistentValue() : FRuntimeException() {
         override fun toString(): String = TODO()
     }
+
+    class DuplicateParamNames() : FRuntimeException() {
+        override fun toString(): String = TODO()
+    }
 }
