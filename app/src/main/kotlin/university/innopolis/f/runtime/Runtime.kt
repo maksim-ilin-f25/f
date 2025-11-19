@@ -7,125 +7,137 @@ import university.innopolis.f.runtime.FRuntimeException.*
 import university.innopolis.f.runtime.FValue.Quote
 import university.innopolis.f.runtime.builtin.*
 
-fun runF(ast: List<FElement>): Sequence<Result<String>> {
-    val rootContext = FContext(parent = null)
-
-    rootContext.set(
+fun loadBuiltinFunctions(context: FContext) {
+    context.set(
         FAtom("plus"),
         FValue.Function(FFunction.Builtin { target, args, context -> plus(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("minus"),
         FValue.Function(FFunction.Builtin { target, args, context -> minus(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("times"),
         FValue.Function(FFunction.Builtin { target, args, context -> times(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("divide"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> divide(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("head"),
         FValue.Function(FFunction.Builtin { target, args, context -> head(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("tail"),
         FValue.Function(FFunction.Builtin { target, args, context -> tail(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("cons"),
         FValue.Function(FFunction.Builtin { target, args, context -> cons(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("equal"),
         FValue.Function(FFunction.Builtin { target, args, context -> equal(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("nonequal"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> nonequal(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("less"),
         FValue.Function(FFunction.Builtin { target, args, context -> less(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("lesseq"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> lesseq(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("greater"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> greater(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("greatereq"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> greatereq(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("isint"),
         FValue.Function(FFunction.Builtin { target, args, context -> isint(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("isreal"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> isreal(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("isbool"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> isbool(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("isnull"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> isnull(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("isatom"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> isatom(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("islist"),
         FValue.Function(
             FFunction.Builtin { target, args, context -> islist(target, args, context) }
         ),
     )
-    rootContext.set(
+    context.set(
         FAtom("and"),
         FValue.Function(FFunction.Builtin { target, args, context -> and(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("or"),
         FValue.Function(FFunction.Builtin { target, args, context -> or(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("xor"),
         FValue.Function(FFunction.Builtin { target, args, context -> xor(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("not"),
         FValue.Function(FFunction.Builtin { target, args, context -> not(target, args, context) }),
     )
-    rootContext.set(
+    context.set(
         FAtom("eval"),
         FValue.Function(FFunction.Builtin { target, args, context -> eval(target, args, context) }),
     )
+
+    // Non-standard:
+
+    context.set(
+        FAtom("isempty"),
+        FValue.Function(
+            FFunction.Builtin { target, args, context -> isempty(target, args, context) }
+        ),
+    )
+}
+
+fun runF(ast: List<FElement>): Sequence<Result<String>> {
+    val rootContext = FContext(parent = null)
+    loadBuiltinFunctions(rootContext)
 
     val context = FContext(parent = rootContext)
     return sequence {
