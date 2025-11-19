@@ -56,7 +56,7 @@ sealed class FSpecialForm {
                 val firstArg = args.first()
                 return when (firstArg) {
                     is FElement.Atom -> Result.success(Setq(name = firstArg.value, value = args[1]))
-                    else -> Result.failure(FRuntimeException.InvalidArgForm())
+                    else -> Result.failure(FRuntimeException.InvalidArgumentPattern())
                 }
             }
         }
@@ -87,16 +87,16 @@ sealed class FSpecialForm {
                 val argParamsRaw = args[1]
                 val argBody = args[2]
                 if (argName !is FElement.Atom) {
-                    return Result.failure(FRuntimeException.InvalidArgForm())
+                    return Result.failure(FRuntimeException.InvalidArgumentPattern())
                 }
                 if (argParamsRaw !is FElement.List) {
-                    return Result.failure(FRuntimeException.InvalidArgForm())
+                    return Result.failure(FRuntimeException.InvalidArgumentPattern())
                 }
                 val argParams =
                     runCatching { argParamsRaw.value.elements.map { (it as FElement.Atom).value } }
                         .getOrNull()
                 if (argParams == null) {
-                    return Result.failure(FRuntimeException.InvalidArgForm())
+                    return Result.failure(FRuntimeException.InvalidArgumentPattern())
                 }
                 val names = argParams.map { it.name }.toSet()
                 if (names.size != argParams.size) {
@@ -127,13 +127,13 @@ sealed class FSpecialForm {
                 val argParamsRaw = args[0]
                 val argBody = args[1]
                 if (argParamsRaw !is FElement.List) {
-                    return Result.failure(FRuntimeException.InvalidArgForm())
+                    return Result.failure(FRuntimeException.InvalidArgumentPattern())
                 }
                 val argParams =
                     runCatching { argParamsRaw.value.elements.map { (it as FElement.Atom).value } }
                         .getOrNull()
                 if (argParams == null) {
-                    return Result.failure(FRuntimeException.InvalidArgForm())
+                    return Result.failure(FRuntimeException.InvalidArgumentPattern())
                 }
                 val names = argParams.map { it.name }.toSet()
                 if (names.size != argParams.size) {
@@ -230,7 +230,7 @@ sealed class FSpecialForm {
                         }
                         .getOrNull()
                 if (argLocalContext == null) {
-                    return Result.failure(FRuntimeException.InvalidArgForm())
+                    return Result.failure(FRuntimeException.InvalidArgumentPattern())
                 }
                 val argBody = args.subList(1, args.size)
                 return Result.success(Prog(bindings = argLocalContext, body = argBody))

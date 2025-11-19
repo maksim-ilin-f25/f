@@ -256,7 +256,7 @@ fun evaluateElementTo(
                     if (funCall == null) {
                         val first = element.value.elements.firstOrNull()
                         if (first == null) {
-                            yield(Result.failure(FRuntimeException.MalformedFunCall()))
+                            yield(Result.failure(FRuntimeException.EmptyParentheses()))
                             return@sequence
                         }
                         val innerTarget = TargetWrapper<FValue?>(null)
@@ -280,7 +280,7 @@ fun evaluateElementTo(
                                 return@sequence
                             }
                             is Quote -> {
-                                yield(Result.failure(FRuntimeException.MalformedFunCall()))
+                                yield(Result.failure(FRuntimeException.NotAFunction()))
                                 return@sequence
                             }
                             is FValue.Function -> {
