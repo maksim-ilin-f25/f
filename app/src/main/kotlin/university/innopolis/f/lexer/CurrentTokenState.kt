@@ -2,7 +2,7 @@ package university.innopolis.f.lexer
 
 import university.innopolis.f.grammar.*
 import university.innopolis.f.utils.CharUtils.isAsciiDigit
-import university.innopolis.f.utils.CharUtils.isAsciiLetter
+import university.innopolis.f.utils.CharUtils.isAsciiLetterOrUnderscore
 
 data class CurrentTokenState(private var _rawValue: String = "", val startCoordinate: Coordinate) {
     val rawValue
@@ -28,12 +28,12 @@ data class CurrentTokenState(private var _rawValue: String = "", val startCoordi
         return withoutSign || withSign
     }
 
-    fun canAddLetter() = _rawValue.firstOrNull()?.isAsciiLetter() ?: true
+    fun canAddLetter() = _rawValue.firstOrNull()?.isAsciiLetterOrUnderscore() ?: true
 
     fun build(): FToken? {
         val integerRegex = Regex("([+-])?[0-9]+")
         val realRegex = Regex("([+-])?[0-9]+\\.[0-9]+")
-        val identifierRegex = Regex("[a-zA-Z][a-zA-Z0-9]*")
+        val identifierRegex = Regex("[_a-zA-Z][_a-zA-Z0-9]*")
 
         return when {
             _rawValue.matches(integerRegex) -> {

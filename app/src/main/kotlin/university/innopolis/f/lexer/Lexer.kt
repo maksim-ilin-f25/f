@@ -1,7 +1,7 @@
 package university.innopolis.f.lexer
 
 import university.innopolis.f.utils.CharUtils.isAsciiDigit
-import university.innopolis.f.utils.CharUtils.isAsciiLetter
+import university.innopolis.f.utils.CharUtils.isAsciiLetterOrUnderscore
 
 fun tokenize(sourceCode: String): Result<List<FToken>> = Lexer().tokenize(sourceCode)
 
@@ -52,7 +52,7 @@ private class Lexer {
                 char == '.' ->
                     processDot().getOrElse { this.errors.addError(it as InvalidTokenException) }
                 char.isAsciiDigit() -> processDigit(char)
-                char.isAsciiLetter() ->
+                char.isAsciiLetterOrUnderscore() ->
                     processLetter(char).getOrElse {
                         this.errors.addError(it as InvalidTokenException)
                     }

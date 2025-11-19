@@ -43,7 +43,9 @@ sealed class FSpecialForm {
                 yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
                 return@sequence
             }
-            context.set(name, evaluated.value!!)
+            if (!name.name.startsWith('_')) {
+                context.set(name, evaluated.value!!)
+            }
         }
 
         companion object {
@@ -65,10 +67,14 @@ sealed class FSpecialForm {
             target: TargetWrapper<FValue?>,
             context: FContext,
         ): Sequence<Result<FValue>> {
-            context.set(
-                name,
-                FValue.Function(FFunction.UserDefined(name = name, params = params, body = body)),
-            )
+            if (!name.name.startsWith('_')) {
+                context.set(
+                    name,
+                    FValue.Function(
+                        FFunction.UserDefined(name = name, params = params, body = body)
+                    ),
+                )
+            }
             return emptySequence()
         }
 
