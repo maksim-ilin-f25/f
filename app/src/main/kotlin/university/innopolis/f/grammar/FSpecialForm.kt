@@ -112,7 +112,7 @@ sealed class FSpecialForm {
     class Lambda(val params: List<FAtom>, val body: FElement) : FSpecialForm() {
         override fun evaluateTo(
             target: TargetWrapper<FValue?>,
-            _context: FContext,
+            context: FContext,
         ): Sequence<Result<FValue>> {
             target.value =
                 FValue.Function(FFunction.UserDefined(name = null, params = params, body = body))
@@ -418,7 +418,7 @@ sealed class FSpecialForm {
 
         override fun evaluateTo(
             target: TargetWrapper<FValue?>,
-            _context: FContext,
+            context: FContext,
         ): Sequence<Result<FValue>> {
             target.value = FValue.Break
             return emptySequence()
