@@ -3,7 +3,7 @@ package university.innopolis.f.runtime
 sealed class FRuntimeException() : IllegalArgumentException() {
     // TODO: add expected and actual
     class InvalidNumOfArgs() : FRuntimeException() {
-        override fun toString(): String = "Invalid number if arguments"
+        override fun toString(): String = "Invalid number of arguments"
     }
 
     /**
@@ -15,7 +15,7 @@ sealed class FRuntimeException() : IllegalArgumentException() {
      */
     // TODO: add expected and actual
     class InvalidArgumentPattern() : FRuntimeException() {
-        override fun toString(): String = "Invalid argument types"
+        override fun toString(): String = "Invalid argument form"
     }
 
     /**
@@ -25,16 +25,16 @@ sealed class FRuntimeException() : IllegalArgumentException() {
      */
     // TODO: add keyword
     class StandaloneKeyword() : FRuntimeException() {
-        override fun toString(): String = "Uncalled standalone keyword"
+        override fun toString(): String = "Standalone keyword"
     }
 
     class EmptyParentheses() : FRuntimeException() {
-        override fun toString(): String = "Call empty list"
+        override fun toString(): String = "Call to an empty list"
     }
 
     // TODO: add atom name
     class UnboundAtom() : FRuntimeException() {
-        override fun toString(): String = "Context does not have an atom"
+        override fun toString(): String = "Atom not found"
     }
 
     /**
@@ -45,12 +45,12 @@ sealed class FRuntimeException() : IllegalArgumentException() {
      */
     // TODO: add not a function name
     class NotAFunction() : FRuntimeException() {
-        override fun toString(): String = "Attempt to call not a function"
+        override fun toString(): String = "Called value is not a function"
     }
 
     // TODO: add expected and actual
     class TypeError() : FRuntimeException() {
-        override fun toString(): String = "Invalid type"
+        override fun toString(): String = "Type mismatch"
     }
 
     // TODO: add fraction
@@ -66,18 +66,18 @@ sealed class FRuntimeException() : IllegalArgumentException() {
     /** `(setq a (setq b 1))` */
     // TODO: add a nonexistent value at least as a string
     class UseOfNonexistentValue() : FRuntimeException() {
-        override fun toString(): String = "Use a nonexistent value"
+        override fun toString(): String = "Assignment failed"
     }
 
     class DuplicateParamNames() : FRuntimeException() {
-        override fun toString(): String = "Create a function with duplicate parameter names"
+        override fun toString(): String = "Function has duplicate parameter names"
     }
 
     class InvalidBreak() : FRuntimeException() {
-        override fun toString(): String = "Call break out of while context"
+        override fun toString(): String = "Called break outside of a while loop"
     }
 
     class InvalidReturn() : FRuntimeException() {
-        override fun toString(): String = "Call return in global context"
+        override fun toString(): String = "Called return outside of a local context"
     }
 }
