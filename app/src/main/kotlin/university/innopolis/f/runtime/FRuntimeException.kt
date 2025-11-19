@@ -21,6 +21,12 @@ sealed class FRuntimeException() : IllegalArgumentException() {
         override fun toString(): String = TODO()
     }
 
+    /**
+     * ```lisp
+     * (setq foo 5)
+     * (foo 6)
+     * ```
+     */
     class NotAFunction() : FRuntimeException() {
         override fun toString(): String = TODO()
     }

@@ -3,7 +3,6 @@ package university.innopolis.f.runtime
 import university.innopolis.f.grammar.FAtom
 import university.innopolis.f.grammar.FElement
 import university.innopolis.f.grammar.FSpecialForm
-import university.innopolis.f.runtime.FRuntimeException.*
 import university.innopolis.f.runtime.FValue.Quote
 import university.innopolis.f.runtime.builtin.*
 
@@ -225,13 +224,13 @@ fun evaluateElementTo(
         when (element) {
             is FElement.Literal -> Quote(element)
             is FElement.Keyword -> {
-                yield(Result.failure(StandaloneKeyword()))
+                yield(Result.failure(FRuntimeException.StandaloneKeyword()))
                 return@sequence
             }
             is FElement.Atom -> {
                 val value = context.valueOf(element.value)
                 if (value == null) {
-                    yield(Result.failure(UnboundAtom()))
+                    yield(Result.failure(FRuntimeException.UnboundAtom()))
                     return@sequence
                 }
                 value
@@ -252,26 +251,63 @@ fun evaluateElementTo(
                     }
                     return@sequence
                 }
-
                 val funCall = element.value.toFunCallOrNull()
-                if (funCall == null) {
-                    yield(Result.failure(MalformedFunCall()))
-                    return@sequence
-                }
-                val function = context.valueOf(funCall.name)
-                if (function == null) {
-                    yield(Result.failure(UnboundAtom()))
-                    return@sequence
-                }
-                if (function !is FValue.Function) {
-                    yield(Result.failure(NotAFunction()))
-                    return@sequence
-                }
+                val function =
+                    if (funCall == null) {
+                        val first = element.value.elements.firstOrNull()
+                        if (first == null) {
+                            yield(Result.failure(FRuntimeException.MalformedFunCall()))
+                            return@sequence
+                        }
+                        val innerTarget = TargetWrapper<FValue?>(null)
+                        for (result in evaluateElementTo(innerTarget, first, context)) {
+                            yield(result)
+                            if (result.isFailure) {
+                                return@sequence
+                            }
+                        }
+                        when (innerTarget.value) {
+                            null -> {
+                                yield(Result.failure(FRuntimeException.UseOfNonexistentValue()))
+                                return@sequence
+                            }
+                            is FValue.Break -> {
+                                target.value = FValue.Break
+                                return@sequence
+                            }
+                            is FValue.Return -> {
+                                target.value = innerTarget.value
+                                return@sequence
+                            }
+                            is Quote -> {
+                                yield(Result.failure(FRuntimeException.MalformedFunCall()))
+                                return@sequence
+                            }
+                            is FValue.Function -> {
+                                (innerTarget.value as FValue.Function).value
+                            }
+                        }
+                    } else {
+                        val maybeFunction = context.valueOf(funCall.name)
+                        if (maybeFunction == null) {
+                            yield(Result.failure(FRuntimeException.UnboundAtom()))
+                            return@sequence
+                        }
+                        if (maybeFunction !is FValue.Function) {
+                            yield(Result.failure(FRuntimeException.NotAFunction()))
+                            return@sequence
+                        }
+                        maybeFunction.value
+                    }
+
+                val argsRaw =
+                    funCall?.args ?: element.value.elements.subList(1, element.value.elements.size)
+
                 val listTarget =
                     TargetWrapper<EvaluateListResult>(
                         EvaluateListResult.ValueWrapper(emptyList<FValue>().toMutableList())
                     )
-                for (result in evaluateListTo(listTarget, funCall.args, context)) {
+                for (result in evaluateListTo(listTarget, argsRaw, context)) {
                     yield(result)
                     if (result.isFailure) {
                         return@sequence
@@ -300,7 +336,7 @@ fun evaluateElementTo(
                             return@sequence
                         }
                     }
-                for (result in function.value.call(target, args, context)) {
+                for (result in function.call(target, args, context)) {
                     yield(result)
                     if (result.isFailure) {
                         return@sequence
