@@ -2,6 +2,6 @@ package university.innopolis.f.grammar
 
 import java.math.BigDecimal
 
-class FReal(private val inner: BigDecimal) {
+class FReal(val inner: BigDecimal) {
     override fun toString() = this.inner.toString()
 }

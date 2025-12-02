@@ -3,10 +3,32 @@ package university.innopolis.f.grammar
 import university.innopolis.f.lexer.Coordinate
 import university.innopolis.f.lexer.FToken
 import university.innopolis.f.parser.ParseException
+import university.innopolis.f.runtime.FunCall
 
 @JvmInline
-value class FList(val elements: MutableList<FElement>) {
-    override fun toString() = "${this.elements}"
+value class FListAst(val elements: MutableList<FElement>) {
+    override fun toString() = this.elements.toString()
+
+    fun funNameOrNull(): FAtom? {
+        val name = this.elements.firstOrNull()
+        return when (name) {
+            is FElement.Atom -> name.value
+            else -> null
+        }
+    }
+
+    fun argsOrNull(): List<FElement>? {
+        if (this.elements.isEmpty()) {
+            return null
+        }
+        return this.elements.subList(1, this.elements.size)
+    }
+
+    fun toFunCallOrNull(): FunCall? {
+        val name = funNameOrNull() ?: return null
+        val args = argsOrNull()!! // checked right above
+        return FunCall(name, args)
+    }
 
     companion object {
         /** On success, returns the index after the matching closing parenthesis. */
@@ -14,8 +36,8 @@ value class FList(val elements: MutableList<FElement>) {
             allTokens: List<FToken>,
             firstElemIndex: Int,
             isFirstRun: Boolean,
-        ): Result<Pair<FList, Int>> {
-            val self = FList(emptyList<FElement>().toMutableList())
+        ): Result<Pair<FListAst, Int>> {
+            val self = FListAst(emptyList<FElement>().toMutableList())
 
             var res = Pair(firstElemIndex, true)
             while (res.second) {
@@ -64,6 +86,7 @@ value class FList(val elements: MutableList<FElement>) {
                     buffer.add(FElement.List(listAst))
                     return Result.success(Pair(nextIndex, true))
                 }
+
                 is FToken.ClosingParenthesis -> {
                     if (isFirstRun) {
                         return Result.failure(
@@ -72,15 +95,19 @@ value class FList(val elements: MutableList<FElement>) {
                     }
                     return Result.success(Pair(currentElemIndex + 1, false))
                 }
+
                 is FToken.Atom -> {
                     buffer.add(FElement.Atom(currentToken.value))
                 }
+
                 is FToken.Literal -> {
                     buffer.add(FElement.Literal(currentToken.value))
                 }
+
                 is FToken.Keyword -> {
                     buffer.add(FElement.Keyword(currentToken.value))
                 }
+
                 is FToken.Quote -> {
                     val res =
                         parseElement(
@@ -93,7 +120,8 @@ value class FList(val elements: MutableList<FElement>) {
                             .getOrElse {
                                 return Result.failure(it)
                             }
-                    buffer[buffer.lastIndex] = FElement.Quote(buffer.last())
+                    val last = buffer.last()
+                    buffer[buffer.lastIndex] = FElement.Quote(last)
                     return Result.success(res)
                 }
             }
